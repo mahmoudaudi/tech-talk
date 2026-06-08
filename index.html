@@ -11,75 +11,96 @@
 
     :root {
       --bg:        #070b12;
-      --surface:   rgba(15,23,42,0.9);
-      --border:    rgba(30,41,59,0.9);
+      --surface:   rgba(12,20,38,0.92);
+      --surface2:  rgba(18,28,52,0.7);
+      --border:    rgba(30,41,59,0.85);
       --border-h:  rgba(0,212,255,0.4);
       --blue:      #00d4ff;
-      --blue-soft: rgba(0,212,255,0.12);
-      --blue-glow: rgba(0,212,255,0.3);
+      --blue-soft: rgba(0,212,255,0.1);
+      --blue-glow: rgba(0,212,255,0.28);
       --purple:    #818cf8;
-      --text:      #cbd5e1;
+      --purple-s:  rgba(129,140,248,0.1);
+      --text:      #94a3b8;
       --bright:    #f1f5f9;
-      --muted:     #475569;
+      --muted:     #3d5166;
       --green:     #34d399;
+      --green-s:   rgba(52,211,153,0.1);
       --amber:     #fbbf24;
+      --amber-s:   rgba(251,191,36,0.1);
       --red:       #f87171;
+      --orange:    #fb923c;
+      --orange-s:  rgba(251,146,60,0.1);
 
-      /* chrome heights — keep padding in sync */
-      --top-chrome:    52px;   /* space taken by topbar + progress */
-      --bottom-chrome: 68px;   /* space taken by nav buttons        */
+      --top-chrome:    52px;
+      --bottom-chrome: 68px;
     }
 
     html, body { height: 100%; overflow: hidden; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
 
     body::before {
       content: ''; position: fixed; inset: 0;
-      background-image: radial-gradient(circle, rgba(0,212,255,0.07) 1px, transparent 1px);
-      background-size: 40px 40px; pointer-events: none; z-index: 0;
+      background-image: radial-gradient(circle, rgba(0,212,255,0.055) 1px, transparent 1px);
+      background-size: 44px 44px; pointer-events: none; z-index: 0;
     }
 
-    #particles-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: 0.32; }
+    #particles-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: 0.28; }
 
-    /* ══ Fixed chrome ══ */
+    /* ══ Progress bar ══ */
     #progress-bar {
       position: fixed; top: 0; left: 0; height: 3px;
       background: linear-gradient(90deg, var(--blue), var(--purple));
       transition: width 0.55s cubic-bezier(.4,0,.2,1);
-      z-index: 500; box-shadow: 0 0 12px var(--blue);
+      z-index: 500; box-shadow: 0 0 16px var(--blue), 0 0 32px var(--blue-glow);
     }
 
+    /* ══ Topbar dots ══ */
     #topbar {
       position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
-      display: flex; align-items: center; gap: 10px; z-index: 500;
+      display: flex; align-items: center; gap: 9px; z-index: 500;
+      background: rgba(7,11,18,0.6); backdrop-filter: blur(12px);
+      border: 1px solid var(--border); border-radius: 100px;
+      padding: 6px 14px;
     }
     .dot-nav {
-      width: 7px; height: 7px; border-radius: 50%; background: var(--muted);
+      width: 6px; height: 6px; border-radius: 50%; background: var(--muted);
       cursor: pointer; border: none;
-      transition: background 0.25s, transform 0.25s, box-shadow 0.25s;
+      transition: background 0.25s, transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s;
     }
-    .dot-nav.active { background: var(--blue); transform: scale(1.5); box-shadow: 0 0 8px var(--blue); }
+    .dot-nav.active { background: var(--blue); transform: scale(1.7); box-shadow: 0 0 10px var(--blue); }
+    .dot-nav:hover:not(.active) { background: var(--text); transform: scale(1.3); }
 
+    /* ══ Slide counter ══ */
     #slide-counter {
-      position: fixed; top: 13px; right: 20px;
-      font-family: 'Orbitron', sans-serif; font-size: 0.65rem;
-      color: var(--muted); letter-spacing: 2px; z-index: 500;
+      position: fixed; top: 9px; right: 20px;
+      font-family: 'Orbitron', sans-serif; font-size: 0.62rem;
+      color: var(--muted); letter-spacing: 2px; z-index: 500; text-align: right; line-height: 1.3;
     }
-    #slide-counter span { color: var(--blue); }
+    #slide-counter .num { color: var(--blue); }
+    #slide-name { font-size: 0.42rem; letter-spacing: 3.5px; color: var(--muted); opacity: 0.55; margin-top: 2px; }
 
+    /* ══ Keyboard hint ══ */
+    #key-hint {
+      position: fixed; bottom: 20px; right: 20px;
+      font-family: 'Orbitron', sans-serif; font-size: 0.42rem; letter-spacing: 2px;
+      color: var(--muted); opacity: 0.45; z-index: 500; pointer-events: none;
+    }
+
+    /* ══ Nav buttons ══ */
     #nav {
       position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
       display: flex; gap: 10px; z-index: 500;
     }
     .nav-btn {
-      padding: 9px 26px;
-      background: rgba(7,11,18,0.8); backdrop-filter: blur(14px);
+      padding: 10px 30px;
+      background: rgba(7,11,18,0.85); backdrop-filter: blur(16px);
       border: 1px solid var(--border); color: var(--muted);
-      font-family: 'Orbitron', sans-serif; font-size: 0.6rem;
-      letter-spacing: 2px; cursor: pointer; border-radius: 100px;
-      transition: all 0.22s cubic-bezier(.4,0,.2,1);
+      font-family: 'Orbitron', sans-serif; font-size: 0.58rem;
+      letter-spacing: 2.5px; cursor: pointer; border-radius: 100px;
+      transition: border-color 0.22s, color 0.22s, box-shadow 0.22s, transform 0.12s;
     }
-    .nav-btn:hover { border-color: var(--blue); color: var(--blue); box-shadow: 0 0 14px var(--blue-glow); }
-    .nav-btn:disabled { opacity: 0.2; pointer-events: none; }
+    .nav-btn:hover  { border-color: var(--blue); color: var(--blue); box-shadow: 0 0 18px var(--blue-glow); }
+    .nav-btn:active { transform: scale(0.95); }
+    .nav-btn:disabled { opacity: 0.18; pointer-events: none; }
 
     /* ══ Slide system ══ */
     #slides-container { position: relative; width: 100vw; height: 100vh; }
@@ -87,275 +108,423 @@
     .slide {
       position: absolute; inset: 0;
       display: flex; flex-direction: column; align-items: center;
-      /* padding = chrome height so content never hides under nav/topbar */
-      padding: var(--top-chrome) 40px var(--bottom-chrome);
+      padding: var(--top-chrome) 44px var(--bottom-chrome);
       overflow-y: auto; overflow-x: hidden;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.48s cubic-bezier(.4,0,.2,1), transform 0.48s cubic-bezier(.4,0,.2,1);
-      transform: translateX(44px);
-      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+      transition: opacity 0.45s cubic-bezier(.4,0,.2,1), transform 0.45s cubic-bezier(.4,0,.2,1);
+      transform: translateX(50px);
+      scrollbar-width: thin; scrollbar-color: rgba(30,41,59,0.6) transparent;
     }
-    .slide::-webkit-scrollbar { width: 3px; }
-    .slide::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-    /* centering spacers — collapse when content overflows so scroll works */
+    .slide::-webkit-scrollbar { width: 2px; }
+    .slide::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
     .slide::before, .slide::after { content: ''; flex: 1 0 0; min-height: 0; }
-
     .slide > * { position: relative; z-index: 2; }
-    .slide.active { opacity: 1; pointer-events: all; transform: translateX(0); }
-    .slide.exit-left { opacity: 0; transform: translateX(-44px); }
+    .slide.active    { opacity: 1; pointer-events: all; transform: translateX(0); }
+    .slide.exit-left { opacity: 0; transform: translateX(-50px); }
 
-    /* ══ Shared elements ══ */
+    /* ══ Shared ══ */
     .slide-tag {
-      font-family: 'Orbitron', sans-serif; font-size: 0.58rem; letter-spacing: 3px;
+      font-family: 'Orbitron', sans-serif; font-size: 0.55rem; letter-spacing: 3.5px;
       color: var(--blue); background: var(--blue-soft);
-      border: 1px solid rgba(0,212,255,0.2); border-radius: 100px;
-      padding: 4px 14px; margin-bottom: 10px; text-transform: uppercase; align-self: center;
+      border: 1px solid rgba(0,212,255,0.18); border-radius: 100px;
+      padding: 4px 16px; margin-bottom: 10px; text-transform: uppercase; align-self: center;
     }
+    .slide-tag.purple { color: var(--purple); background: var(--purple-s); border-color: rgba(129,140,248,0.2); }
+    .slide-tag.amber  { color: var(--amber);  background: var(--amber-s);  border-color: rgba(251,191,36,0.2);  }
+    .slide-tag.green  { color: var(--green);  background: var(--green-s);  border-color: rgba(52,211,153,0.2);  }
 
     .slide-title {
-      font-family: 'Orbitron', sans-serif; font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+      font-family: 'Orbitron', sans-serif; font-size: clamp(1.55rem, 3.2vw, 2.5rem);
       font-weight: 900; color: var(--bright); text-align: center;
       margin-bottom: 8px; line-height: 1.15; align-self: center;
     }
-
-    .accent { color: var(--blue); }
+    .accent       { color: var(--blue); }
+    .accent-p     { color: var(--purple); }
+    .accent-amber { color: var(--amber); }
+    .accent-green { color: var(--green); }
 
     .divider {
-      width: 60px; height: 2px; align-self: center;
+      width: 70px; height: 2px; align-self: center;
       background: linear-gradient(90deg, transparent, var(--blue), transparent);
-      margin-bottom: 20px;
+      margin-bottom: 22px; border-radius: 2px;
     }
+    .divider.purple { background: linear-gradient(90deg, transparent, var(--purple), transparent); }
+    .divider.amber  { background: linear-gradient(90deg, transparent, var(--amber),  transparent); }
+    .divider.green  { background: linear-gradient(90deg, transparent, var(--green),  transparent); }
 
     /* ══════════ SLIDE 1 — Hero ══════════ */
     #slide-1 {
       background:
-        radial-gradient(ellipse 70% 50% at 50% 0%, rgba(0,212,255,0.1) 0%, transparent 65%),
-        radial-gradient(ellipse 45% 35% at 80% 85%, rgba(129,140,248,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 75% 55% at 50% 0%,  rgba(0,212,255,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 45% 35% at 85% 90%, rgba(129,140,248,0.08) 0%, transparent 55%),
         var(--bg);
     }
 
+    .hero-eyebrow {
+      font-family: 'Orbitron', sans-serif; font-size: 0.55rem; letter-spacing: 5px;
+      color: var(--blue); text-transform: uppercase; text-align: center;
+      margin-bottom: 16px; opacity: 0.7;
+    }
+    .hero-eyebrow span {
+      display: inline-block; width: 22px; height: 1px;
+      background: var(--blue); vertical-align: middle; margin: 0 10px; opacity: 0.5;
+    }
+
     .hero-title {
-      font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 6vw, 4.5rem);
-      font-weight: 900; text-align: center; line-height: 1.08;
-      background: linear-gradient(135deg, #fff 25%, var(--blue) 65%, var(--purple) 100%);
+      font-family: 'Orbitron', sans-serif; font-size: clamp(2.2rem, 6.5vw, 5rem);
+      font-weight: 900; text-align: center; line-height: 1.06;
+      background: linear-gradient(140deg, #ffffff 15%, var(--blue) 55%, var(--purple) 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      margin-bottom: 12px; letter-spacing: -1px;
+      margin-bottom: 14px; letter-spacing: -1.5px;
     }
     .hero-sub {
-      font-size: clamp(0.78rem, 1.8vw, 0.98rem); color: var(--muted);
-      text-align: center; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 36px;
+      font-size: clamp(0.76rem, 1.7vw, 0.94rem); color: var(--muted);
+      text-align: center; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 40px;
     }
+
     .question-box {
-      background: var(--surface); backdrop-filter: blur(16px);
-      border: 1px solid var(--border); border-radius: 20px;
-      padding: 28px 36px; text-align: center; max-width: 520px; width: 100%;
-      transition: border-color 0.3s;
+      background: var(--surface); backdrop-filter: blur(24px);
+      border: 1px solid rgba(30,41,59,0.7); border-radius: 22px;
+      padding: 30px 38px; text-align: center; max-width: 520px; width: 100%;
+      box-shadow: 0 0 0 1px rgba(0,212,255,0.04), inset 0 1px 0 rgba(255,255,255,0.04);
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
-    .question-box:hover { border-color: var(--border-h); }
-    .question-text { font-size: clamp(0.95rem, 2vw, 1.2rem); color: var(--bright); margin-bottom: 22px; font-weight: 500; line-height: 1.6; }
+    .question-box:hover { border-color: rgba(0,212,255,0.15); box-shadow: 0 0 30px rgba(0,212,255,0.06); }
+    .question-text { font-size: clamp(0.95rem, 1.9vw, 1.18rem); color: var(--bright); margin-bottom: 24px; font-weight: 500; line-height: 1.65; }
 
     .vote-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
     .vote-btn {
-      padding: 11px 44px; font-family: 'Orbitron', sans-serif; font-size: 0.78rem;
+      padding: 11px 44px; font-family: 'Orbitron', sans-serif; font-size: 0.72rem;
       letter-spacing: 3px; border-radius: 100px; cursor: pointer; border: 1.5px solid;
       transition: all 0.22s cubic-bezier(.4,0,.2,1); font-weight: 700;
     }
+    .vote-btn:active { transform: scale(0.94); }
     .vote-btn.yes { background: transparent; border-color: var(--green); color: var(--green); }
-    .vote-btn.yes:hover, .vote-btn.yes.voted { background: var(--green); color: #070b12; box-shadow: 0 0 22px rgba(52,211,153,0.4); }
+    .vote-btn.yes:hover, .vote-btn.yes.voted { background: var(--green); color: #070b12; box-shadow: 0 0 28px rgba(52,211,153,0.45); }
     .vote-btn.no  { background: transparent; border-color: var(--red); color: var(--red); }
-    .vote-btn.no:hover,  .vote-btn.no.voted  { background: var(--red);   color: #070b12; box-shadow: 0 0 22px rgba(248,113,113,0.4); }
+    .vote-btn.no:hover,  .vote-btn.no.voted  { background: var(--red);   color: #070b12; box-shadow: 0 0 28px rgba(248,113,113,0.45); }
 
-    .vote-results { margin-top: 18px; min-height: 52px; display: flex; flex-direction: column; gap: 10px; }
-    .vote-bar-row { display: flex; align-items: center; gap: 10px; }
-    .vote-bar-label { width: 30px; font-family: 'Orbitron', sans-serif; font-size: 0.58rem; letter-spacing: 1px; }
-    .vote-bar-label.yes { color: var(--green); } .vote-bar-label.no { color: var(--red); }
-    .vote-bar-track { flex: 1; height: 5px; background: var(--border); border-radius: 100px; overflow: hidden; }
+    .vote-results { margin-top: 20px; min-height: 54px; display: flex; flex-direction: column; gap: 10px; }
+    .vote-bar-row { display: flex; align-items: center; gap: 11px; }
+    .vote-bar-label { width: 30px; font-family: 'Orbitron', sans-serif; font-size: 0.56rem; letter-spacing: 1px; }
+    .vote-bar-label.yes { color: var(--green); }
+    .vote-bar-label.no  { color: var(--red);   }
+    .vote-bar-track { flex: 1; height: 5px; background: rgba(30,41,59,0.8); border-radius: 100px; overflow: hidden; }
     .vote-bar-fill { height: 100%; border-radius: 100px; transition: width 0.5s cubic-bezier(.4,0,.2,1); }
-    .vote-bar-fill.yes { background: var(--green); } .vote-bar-fill.no { background: var(--red); }
-    .vote-bar-count { width: 28px; text-align: right; font-weight: 700; font-size: 0.88rem; }
-    .vote-bar-count.yes { color: var(--green); } .vote-bar-count.no { color: var(--red); }
+    .vote-bar-fill.yes { background: linear-gradient(90deg, var(--green), rgba(52,211,153,0.7)); }
+    .vote-bar-fill.no  { background: linear-gradient(90deg, var(--red), rgba(248,113,113,0.7)); }
+    .vote-bar-count { width: 24px; text-align: right; font-weight: 700; font-size: 0.9rem; }
+    .vote-bar-count.yes { color: var(--green); }
+    .vote-bar-count.no  { color: var(--red);   }
 
     /* ══════════ SLIDE 2 — Robotics ══════════ */
+    #slide-2 {
+      background:
+        radial-gradient(ellipse 60% 45% at 50% 0%, rgba(0,212,255,0.07) 0%, transparent 60%),
+        var(--bg);
+    }
+
     .definition-box {
-      background: var(--surface); backdrop-filter: blur(12px);
-      border-left: 3px solid var(--blue); border-radius: 10px;
-      padding: 14px 20px; max-width: 820px; width: 100%;
-      margin-bottom: 16px; font-size: 0.95rem; line-height: 1.78; color: var(--text);
+      background: var(--surface); backdrop-filter: blur(14px);
+      border-left: 3px solid var(--blue); border-radius: 12px;
+      padding: 16px 22px; max-width: 820px; width: 100%;
+      margin-bottom: 18px; font-size: 0.96rem; line-height: 1.82; color: var(--text);
+      box-shadow: inset 0 0 30px rgba(0,212,255,0.02);
     }
-    .platforms-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 100%; max-width: 820px; }
+
+    .platforms-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%; max-width: 820px; }
+
     .platform-card {
-      background: var(--surface); backdrop-filter: blur(12px);
-      border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
-      transition: transform 0.25s cubic-bezier(.4,0,.2,1), box-shadow 0.25s, border-color 0.25s;
+      background: var(--surface); backdrop-filter: blur(14px);
+      border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+      transition: transform 0.28s cubic-bezier(.34,1.56,.64,1), box-shadow 0.28s, border-color 0.28s;
     }
-    .platform-card:hover { transform: translateY(-5px); box-shadow: 0 12px 36px rgba(0,212,255,0.15); border-color: var(--border-h); }
-    .platform-card img { width: 100%; height: 120px; object-fit: cover; display: block; background: var(--border); }
-    .platform-info { padding: 12px 15px; }
-    .platform-name { font-family: 'Orbitron', sans-serif; font-size: 0.72rem; color: var(--blue); margin-bottom: 6px; letter-spacing: 1px; }
-    .platform-desc { font-size: 0.85rem; color: var(--text); line-height: 1.58; }
+    .platform-card:hover { transform: translateY(-7px); }
+
+    .platform-stripe { height: 3px; width: 100%; }
+
+    .platform-card.arduino .platform-stripe { background: linear-gradient(90deg, var(--green), rgba(52,211,153,0.3)); }
+    .platform-card.arduino .platform-name   { color: var(--green); }
+    .platform-card.arduino:hover            { border-color: rgba(52,211,153,0.4); box-shadow: 0 16px 40px rgba(52,211,153,0.12); }
+
+    .platform-card.esp32   .platform-stripe { background: linear-gradient(90deg, var(--purple), rgba(129,140,248,0.3)); }
+    .platform-card.esp32   .platform-name   { color: var(--purple); }
+    .platform-card.esp32:hover              { border-color: rgba(129,140,248,0.4); box-shadow: 0 16px 40px rgba(129,140,248,0.12); }
+
+    .platform-card.rpi     .platform-stripe { background: linear-gradient(90deg, var(--orange), rgba(251,146,60,0.3)); }
+    .platform-card.rpi     .platform-name   { color: var(--orange); }
+    .platform-card.rpi:hover                { border-color: rgba(251,146,60,0.4); box-shadow: 0 16px 40px rgba(251,146,60,0.12); }
+
+    .platform-card img { width: 100%; height: 120px; object-fit: cover; display: block; background: rgba(15,23,42,0.9); }
+    .platform-info { padding: 14px 16px; }
+    .platform-name { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; margin-bottom: 7px; letter-spacing: 1px; }
+    .platform-desc { font-size: 0.84rem; color: var(--text); line-height: 1.62; }
 
     /* ══════════ SLIDE 3 — My Story ══════════ */
-    .story-layout {
-      display: grid; grid-template-columns: 1fr 1.3fr;
-      gap: 26px; max-width: 880px; width: 100%; align-items: start;
+    #slide-3 {
+      background:
+        radial-gradient(ellipse 55% 50% at 90% 20%, rgba(129,140,248,0.1) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 10% 80%, rgba(0,212,255,0.06) 0%, transparent 55%),
+        var(--bg);
     }
-    .story-image { border-radius: 14px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 0 40px rgba(0,212,255,0.11); }
+
+    .story-layout {
+      display: grid; grid-template-columns: 1fr 1.4fr;
+      gap: 28px; max-width: 900px; width: 100%; align-items: start;
+    }
+    .story-image {
+      border-radius: 16px; overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 0 1px rgba(129,140,248,0.08), 0 20px 60px rgba(0,0,0,0.4);
+      position: relative;
+    }
+    .story-image::after {
+      content: 'Brave Organization Workshop';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(to top, rgba(7,11,18,0.9) 0%, transparent 100%);
+      color: var(--muted); font-size: 0.62rem; letter-spacing: 2px; text-align: center;
+      padding: 18px 10px 10px; font-family: 'Orbitron', sans-serif;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .story-image:hover::after { opacity: 1; }
     .story-image img { width: 100%; height: auto; max-height: 320px; object-fit: scale-down; display: block; }
 
     .story-content { display: flex; flex-direction: column; gap: 0; }
-    .story-step { display: flex; gap: 14px; align-items: flex-start; padding-bottom: 16px; position: relative; }
+    .story-step { display: flex; gap: 14px; align-items: flex-start; padding-bottom: 18px; position: relative; }
     .story-step:not(:last-child)::before {
-      content: ''; position: absolute; left: 14px; top: 32px; bottom: 0;
-      width: 1.5px; background: linear-gradient(to bottom, var(--blue), transparent); opacity: 0.22;
+      content: ''; position: absolute; left: 15px; top: 34px; bottom: 0;
+      width: 1px; background: linear-gradient(to bottom, rgba(129,140,248,0.4), transparent);
     }
     .step-num {
-      font-family: 'Orbitron', sans-serif; font-size: 0.6rem; color: var(--blue);
-      background: var(--blue-soft); border: 1px solid rgba(0,212,255,0.25);
-      border-radius: 50%; width: 30px; height: 30px; min-width: 30px;
-      display: flex; align-items: center; justify-content: center; margin-top: 2px;
+      font-family: 'Orbitron', sans-serif; font-size: 0.58rem; color: var(--purple);
+      background: var(--purple-s); border: 1px solid rgba(129,140,248,0.22);
+      border-radius: 50%; width: 32px; height: 32px; min-width: 32px;
+      display: flex; align-items: center; justify-content: center; margin-top: 1px;
     }
-    .step-text { font-size: 0.93rem; line-height: 1.68; color: var(--text); padding-top: 3px; }
-    .step-text strong { color: var(--blue); font-weight: 600; }
+    .step-text { font-size: 0.94rem; line-height: 1.72; color: var(--text); padding-top: 4px; }
+    .step-text strong { color: var(--bright); font-weight: 600; }
 
     .quote-box {
-      background: rgba(0,212,255,0.04); border: 1px solid rgba(0,212,255,0.15);
-      border-radius: 10px; padding: 14px 18px 14px 22px;
-      font-style: italic; font-size: 0.95rem; color: var(--bright); line-height: 1.7;
+      background: rgba(129,140,248,0.05); border: 1px solid rgba(129,140,248,0.14);
+      border-radius: 12px; padding: 16px 20px 16px 24px;
+      font-style: italic; font-size: 0.95rem; color: var(--bright); line-height: 1.75;
       position: relative; margin-top: 2px;
     }
     .quote-box::before {
-      content: '"'; position: absolute; top: -10px; left: 14px;
-      font-size: 3rem; color: var(--blue); opacity: 0.18; font-style: normal; line-height: 1;
+      content: '"'; position: absolute; top: -8px; left: 14px;
+      font-size: 3.5rem; color: var(--purple); opacity: 0.2; font-style: normal; line-height: 1;
     }
 
     /* ══════════ SLIDE 4 — Competition ══════════ */
+    #slide-4 {
+      background:
+        radial-gradient(ellipse 55% 45% at 30% 80%, rgba(251,191,36,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 35% at 75% 10%, rgba(0,212,255,0.06) 0%, transparent 55%),
+        var(--bg);
+    }
+
     .competition-layout { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 900px; }
 
     .comp-images { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .comp-images img {
+
+    .comp-img-wrap { position: relative; border-radius: 12px; overflow: hidden; }
+    .comp-img-wrap img {
       width: 100%; height: auto; max-height: 180px; object-fit: scale-down; display: block;
-      border-radius: 10px; transition: transform 0.25s cubic-bezier(.4,0,.2,1), box-shadow 0.25s;
+      transition: transform 0.32s cubic-bezier(.4,0,.2,1), filter 0.32s;
+      background: rgba(10,15,25,0.9);
     }
-    .comp-images img:hover { transform: scale(1.04); box-shadow: 0 8px 28px rgba(0,212,255,0.2); }
+    .comp-img-wrap:hover img { transform: scale(1.06); filter: brightness(0.7); }
+    .comp-img-caption {
+      position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center;
+      padding-bottom: 10px;
+      font-family: 'Orbitron', sans-serif; font-size: 0.55rem; letter-spacing: 2.5px; color: #fff;
+      opacity: 0; transition: opacity 0.28s;
+    }
+    .comp-img-wrap:hover .comp-img-caption { opacity: 1; }
 
-    /* video: constrain height to prevent it from taking full screen */
     .comp-video { width: 100%; }
+    .comp-video-label {
+      font-family: 'Orbitron', sans-serif; font-size: 0.5rem; letter-spacing: 3px;
+      color: var(--amber); opacity: 0.7; margin-bottom: 7px;
+    }
     .comp-video video {
-      width: 100%; max-height: 220px; display: block;
-      border-radius: 12px; border: 1px solid var(--border); object-fit: contain; background: #000;
+      width: 100%; max-height: 210px; display: block;
+      border-radius: 12px; border: 1px solid rgba(251,191,36,0.15);
+      object-fit: contain; background: #000;
+      box-shadow: 0 0 30px rgba(251,191,36,0.06);
     }
 
-    .comp-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .comp-info { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
     .comp-fact {
-      background: var(--surface); backdrop-filter: blur(10px);
-      border: 1px solid var(--border); border-radius: 10px;
-      padding: 10px 14px; font-size: 0.88rem;
-      display: flex; align-items: flex-start; gap: 8px; line-height: 1.55; color: var(--text);
-      transition: border-color 0.22s;
+      background: var(--surface); backdrop-filter: blur(12px);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px 14px; font-size: 0.87rem;
+      display: flex; align-items: flex-start; gap: 9px; line-height: 1.58; color: var(--text);
+      transition: border-color 0.22s, transform 0.22s;
     }
-    .comp-fact:hover { border-color: var(--border-h); }
-    .fact-icon { font-size: 1rem; flex-shrink: 0; margin-top: 2px; }
+    .comp-fact:hover { border-color: rgba(0,212,255,0.25); transform: translateY(-2px); }
+    .fact-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
     .win-badge {
-      font-family: 'Orbitron', sans-serif; font-size: 0.64rem; letter-spacing: 2px;
-      color: var(--amber); background: rgba(251,191,36,0.09);
-      border: 1px solid rgba(251,191,36,0.35); border-radius: 10px;
-      padding: 10px 14px; display: flex; align-items: center; justify-content: center; gap: 6px;
+      font-family: 'Orbitron', sans-serif; font-size: 0.64rem; letter-spacing: 2.5px;
+      color: var(--amber); background: rgba(251,191,36,0.07);
+      border: 1px solid rgba(251,191,36,0.3); border-radius: 12px;
+      padding: 12px 14px; display: flex; align-items: center; justify-content: center; gap: 7px;
+      animation: pulse-gold 2.5s ease-in-out infinite;
+    }
+    @keyframes pulse-gold {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(251,191,36,0); }
+      50%       { box-shadow: 0 0 0 6px rgba(251,191,36,0.12), 0 0 20px rgba(251,191,36,0.1); }
     }
 
     /* ══════════ SLIDE 5 — Quiz ══════════ */
-    .quiz-container { display: flex; flex-direction: column; gap: 18px; max-width: 700px; width: 100%; }
-    .quiz-q {
-      background: var(--surface); backdrop-filter: blur(12px);
-      border: 1px solid var(--border); border-radius: 14px; padding: 20px 24px;
-      transition: border-color 0.22s;
+    #slide-5 {
+      background:
+        radial-gradient(ellipse 60% 45% at 70% 10%, rgba(52,211,153,0.08) 0%, transparent 60%),
+        var(--bg);
     }
-    .quiz-q:focus-within { border-color: var(--border-h); }
-    .q-label { font-family: 'Orbitron', sans-serif; font-size: 0.55rem; color: var(--blue); letter-spacing: 3px; margin-bottom: 8px; opacity: 0.85; }
-    .q-text { font-size: 1rem; font-weight: 600; color: var(--bright); margin-bottom: 16px; line-height: 1.55; }
+
+    .quiz-container { display: flex; flex-direction: column; gap: 18px; max-width: 720px; width: 100%; }
+    .quiz-q {
+      background: var(--surface); backdrop-filter: blur(14px);
+      border: 1px solid var(--border); border-radius: 16px; padding: 22px 26px;
+      transition: border-color 0.22s, box-shadow 0.22s;
+    }
+    .quiz-q.answered { border-color: rgba(52,211,153,0.18); }
+    .q-label {
+      font-family: 'Orbitron', sans-serif; font-size: 0.5rem; color: var(--green);
+      letter-spacing: 4px; margin-bottom: 9px; opacity: 0.8;
+    }
+    .q-text { font-size: 1rem; font-weight: 600; color: var(--bright); margin-bottom: 16px; line-height: 1.6; }
     .q-options { display: flex; flex-wrap: wrap; gap: 9px; }
     .q-option {
-      padding: 9px 24px; border-radius: 100px; border: 1px solid var(--border);
+      padding: 10px 26px; border-radius: 100px; border: 1px solid var(--border);
       background: transparent; color: var(--text); font-family: 'Inter', sans-serif;
       font-size: 0.9rem; cursor: pointer; font-weight: 500;
-      transition: all 0.18s cubic-bezier(.4,0,.2,1);
+      transition: all 0.2s cubic-bezier(.4,0,.2,1);
     }
-    .q-option:hover:not(:disabled) { border-color: var(--blue); color: var(--blue); background: var(--blue-soft); }
-    .q-option.correct { border-color: var(--green); background: rgba(52,211,153,0.11); color: var(--green); }
-    .q-option.neutral { border-color: var(--blue);  background: var(--blue-soft);        color: var(--blue); }
+    .q-option:hover:not(:disabled) { border-color: var(--green); color: var(--green); background: var(--green-s); transform: translateY(-1px); }
+    .q-option:active:not(:disabled) { transform: scale(0.95); }
+    .q-option.correct { border-color: var(--green); background: var(--green-s); color: var(--green); font-weight: 600; }
+    .q-option.neutral { border-color: var(--blue);  background: var(--blue-soft);  color: var(--blue); }
+    .q-option:disabled:not(.correct):not(.neutral) { opacity: 0.3; }
     .q-option:disabled { cursor: default; }
     .q-explanation {
-      margin-top: 14px; padding: 12px 16px; border-radius: 8px;
-      background: rgba(0,212,255,0.04); border-left: 2px solid var(--blue);
-      font-size: 0.9rem; color: var(--text); line-height: 1.68; display: none;
-      animation: fadeUp 0.3s ease forwards;
+      margin-top: 16px; padding: 12px 18px; border-radius: 10px;
+      background: rgba(52,211,153,0.04); border-left: 2px solid var(--green);
+      font-size: 0.9rem; color: var(--text); line-height: 1.72; display: none;
     }
-    .q-explanation.visible { display: block; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+    .q-explanation.visible { display: block; animation: fadeUp 0.32s ease forwards; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
     /* ══════════ SLIDE 6 — Learnings ══════════ */
+    #slide-6 {
+      background:
+        radial-gradient(ellipse 50% 40% at 15% 55%, rgba(0,212,255,0.06) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 85% 25%, rgba(129,140,248,0.06) 0%, transparent 55%),
+        var(--bg);
+    }
+
     .learnings-container { max-width: 700px; width: 100%; display: flex; flex-direction: column; gap: 10px; }
+
     .learning-item {
-      display: flex; gap: 14px; align-items: center;
-      background: var(--surface); backdrop-filter: blur(12px);
-      border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px;
-      opacity: 0; transform: translateX(-22px);
-      transition: opacity 0.44s cubic-bezier(.4,0,.2,1), transform 0.44s cubic-bezier(.4,0,.2,1), border-color 0.22s;
+      display: flex; gap: 16px; align-items: center;
+      background: var(--surface); backdrop-filter: blur(14px);
+      border: 1px solid var(--border); border-radius: 14px; padding: 14px 20px;
+      border-left-width: 3px;
+      opacity: 0; transform: translateX(-26px);
+      transition: opacity 0.45s cubic-bezier(.4,0,.2,1), transform 0.45s cubic-bezier(.4,0,.2,1),
+                  border-color 0.25s, box-shadow 0.25s;
     }
     .learning-item.revealed { opacity: 1; transform: translateX(0); }
-    .learning-item:hover { border-color: var(--border-h); }
-    .learning-num {
-      font-family: 'Orbitron', sans-serif; font-size: 0.6rem; color: var(--blue);
-      background: var(--blue-soft); border: 1px solid rgba(0,212,255,0.2);
-      border-radius: 8px; width: 34px; height: 34px; min-width: 34px;
+    .learning-item:nth-child(1) { border-left-color: var(--blue); }
+    .learning-item:nth-child(2) { border-left-color: var(--green); }
+    .learning-item:nth-child(3) { border-left-color: var(--amber); }
+    .learning-item:nth-child(4) { border-left-color: var(--purple); }
+    .learning-item:nth-child(1):hover { box-shadow: 0 4px 22px rgba(0,212,255,0.08); border-top-color: rgba(0,212,255,0.3); }
+    .learning-item:nth-child(2):hover { box-shadow: 0 4px 22px rgba(52,211,153,0.08); border-top-color: rgba(52,211,153,0.3); }
+    .learning-item:nth-child(3):hover { box-shadow: 0 4px 22px rgba(251,191,36,0.08); border-top-color: rgba(251,191,36,0.3); }
+    .learning-item:nth-child(4):hover { box-shadow: 0 4px 22px rgba(129,140,248,0.08); border-top-color: rgba(129,140,248,0.3); }
+
+    .learning-icon-wrap {
+      font-size: 1.3rem; width: 42px; height: 42px; min-width: 42px;
       display: flex; align-items: center; justify-content: center;
+      border-radius: 10px; background: rgba(255,255,255,0.03);
     }
-    .learning-text { font-size: 0.95rem; line-height: 1.6; color: var(--text); }
+    .learning-text { font-size: 0.94rem; line-height: 1.65; color: var(--text); }
     .learning-text strong { color: var(--bright); font-weight: 700; }
 
     .closing-quote-box {
-      background: rgba(0,212,255,0.04); border: 1px solid rgba(0,212,255,0.15);
-      border-radius: 14px; padding: 20px 26px; max-width: 700px; width: 100%;
+      border-radius: 16px; padding: 22px 28px; max-width: 700px; width: 100%;
       margin-top: 14px; text-align: center;
-      opacity: 0; transform: translateY(14px);
-      transition: opacity 0.5s cubic-bezier(.4,0,.2,1), transform 0.5s cubic-bezier(.4,0,.2,1);
+      background: linear-gradient(135deg, rgba(0,212,255,0.05) 0%, rgba(129,140,248,0.05) 100%);
+      border: 1px solid rgba(129,140,248,0.14);
+      opacity: 0; transform: translateY(16px);
+      transition: opacity 0.55s cubic-bezier(.4,0,.2,1) 0.1s, transform 0.55s cubic-bezier(.4,0,.2,1) 0.1s;
+      position: relative; overflow: hidden;
+    }
+    .closing-quote-box::before {
+      content: '"'; position: absolute; top: -20px; left: 18px;
+      font-size: 8rem; color: var(--purple); opacity: 0.06; font-family: Georgia, serif; line-height: 1;
+      pointer-events: none;
     }
     .closing-quote-box.revealed { opacity: 1; transform: translateY(0); }
-    .closing-quote { font-size: clamp(0.88rem, 1.8vw, 1rem); font-style: italic; color: var(--text); line-height: 1.85; }
+    .closing-quote { font-size: clamp(0.88rem, 1.8vw, 1rem); font-style: italic; color: var(--text); line-height: 1.9; }
 
     /* ══════════ SLIDE 7 — Thank You ══════════ */
     #slide-7 {
       background:
-        radial-gradient(ellipse 65% 55% at 50% 50%, rgba(0,212,255,0.09) 0%, transparent 65%),
-        radial-gradient(ellipse 40% 40% at 15% 80%, rgba(129,140,248,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 65% 55% at 50% 50%, rgba(0,212,255,0.1) 0%, transparent 62%),
+        radial-gradient(ellipse 40% 40% at 15% 80%, rgba(129,140,248,0.08) 0%, transparent 55%),
         var(--bg);
     }
-    .thankyou-wrap { display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center; }
+
+    .thankyou-rings {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      pointer-events: none; z-index: 1;
+    }
+    .ring {
+      position: absolute; border-radius: 50%; border: 1px solid;
+      animation: ring-pulse 4s ease-in-out infinite;
+    }
+    .ring-1 { width: 300px; height: 300px; border-color: rgba(0,212,255,0.07); animation-delay: 0s; }
+    .ring-2 { width: 500px; height: 500px; border-color: rgba(129,140,248,0.05); animation-delay: 1.3s; }
+    .ring-3 { width: 700px; height: 700px; border-color: rgba(0,212,255,0.03); animation-delay: 2.6s; }
+    @keyframes ring-pulse {
+      0%, 100% { transform: scale(1);    opacity: 0.4; }
+      50%       { transform: scale(1.05); opacity: 1;   }
+    }
+
+    .thankyou-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 22px;
+      text-align: center; position: relative; z-index: 3;
+    }
     .thankyou-tag {
-      font-family: 'Orbitron', sans-serif; font-size: 0.58rem; letter-spacing: 4px;
+      font-family: 'Orbitron', sans-serif; font-size: 0.55rem; letter-spacing: 4.5px;
       color: var(--blue); background: var(--blue-soft);
-      border: 1px solid rgba(0,212,255,0.2); border-radius: 100px; padding: 5px 18px; text-transform: uppercase;
+      border: 1px solid rgba(0,212,255,0.18); border-radius: 100px; padding: 5px 20px; text-transform: uppercase;
     }
     .thankyou-title {
-      font-family: 'Orbitron', sans-serif; font-size: clamp(3rem, 9vw, 7rem); font-weight: 900; line-height: 1;
-      background: linear-gradient(135deg, #fff 20%, var(--blue) 60%, var(--purple) 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -2px;
+      font-family: 'Orbitron', sans-serif; font-size: clamp(3.2rem, 10vw, 7.5rem); font-weight: 900; line-height: 1;
+      background: linear-gradient(140deg, #ffffff 15%, var(--blue) 55%, var(--purple) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      letter-spacing: -3px;
     }
-    .thankyou-divider { width: 90px; height: 2px; background: linear-gradient(90deg, transparent, var(--blue), transparent); }
-    .thankyou-question { font-size: clamp(1rem, 2.5vw, 1.4rem); color: var(--muted); letter-spacing: 3px; text-transform: uppercase; font-weight: 300; }
-    .thankyou-name { font-family: 'Orbitron', sans-serif; font-size: clamp(0.65rem, 1.4vw, 0.85rem); color: var(--muted); letter-spacing: 3px; }
+    .thankyou-divider { width: 100px; height: 2px; background: linear-gradient(90deg, transparent, var(--blue), var(--purple), transparent); border-radius: 2px; }
+    .thankyou-question { font-size: clamp(1rem, 2.5vw, 1.4rem); color: var(--muted); letter-spacing: 3.5px; text-transform: uppercase; font-weight: 300; }
+    .thankyou-name { font-family: 'Orbitron', sans-serif; font-size: clamp(0.58rem, 1.2vw, 0.78rem); color: var(--muted); letter-spacing: 3px; opacity: 0.55; }
 
     /* ══ Responsive ══ */
     @media (max-width: 768px) {
-      .slide          { padding: var(--top-chrome) 18px var(--bottom-chrome); }
+      .slide          { padding: var(--top-chrome) 16px var(--bottom-chrome); }
       .platforms-grid { grid-template-columns: 1fr; }
       .story-layout   { grid-template-columns: 1fr; }
       .comp-info      { grid-template-columns: 1fr; }
-      .comp-images    { grid-template-columns: repeat(3, 1fr); }
     }
-    @media (max-width: 480px) {
+    @media (max-width: 500px) {
       .vote-buttons   { flex-direction: column; align-items: center; }
       .comp-images    { grid-template-columns: 1fr 1fr; }
+      .comp-info      { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -363,13 +532,21 @@
 
 <canvas id="particles-canvas"></canvas>
 <div id="progress-bar"></div>
-<div id="topbar" role="tablist" aria-label="Slide navigation dots"></div>
-<div id="slide-counter"><span id="cur">01</span> / <span id="tot">07</span></div>
+
+<div id="topbar" role="tablist" aria-label="Slide navigation"></div>
+
+<div id="slide-counter">
+  <span class="num" id="cur">01</span><span style="color:var(--muted)"> / </span><span id="tot">07</span>
+  <div id="slide-name">HERO</div>
+</div>
+
+<div id="key-hint">← → Arrow keys</div>
 
 <div id="slides-container">
 
   <!-- SLIDE 1 — Hero -->
   <section class="slide active" id="slide-1" data-index="0">
+    <p class="hero-eyebrow"><span></span>CS Student Presentation<span></span></p>
     <h1 class="hero-title">My Robotics<br/>Journey</h1>
     <p class="hero-sub">From a blinking LED to a championship robot</p>
     <div class="question-box">
@@ -391,21 +568,24 @@
       <strong style="color:var(--bright)">Robotics</strong> is the branch of engineering and computer science that designs, builds, and programs machines capable of carrying out tasks automatically — bridging the physical and digital worlds. At its heart is a <span class="accent">microcontroller</span>: the brain that reads sensors and drives actuators.
     </div>
     <div class="platforms-grid">
-      <div class="platform-card">
+      <div class="platform-card arduino">
+        <div class="platform-stripe"></div>
         <img src="images/arduino.jpg" alt="Arduino Uno" loading="lazy" />
         <div class="platform-info">
           <p class="platform-name">Arduino Uno</p>
           <p class="platform-desc">Open-source microcontroller. Simple C-like language, massive community. Perfect for beginners.</p>
         </div>
       </div>
-      <div class="platform-card">
+      <div class="platform-card esp32">
+        <div class="platform-stripe"></div>
         <img src="images/esp32.jpg" alt="ESP32" loading="lazy" />
         <div class="platform-info">
           <p class="platform-name">ESP32</p>
           <p class="platform-desc">Built-in Wi-Fi &amp; Bluetooth. Powerful and affordable. Ideal for IoT robots.</p>
         </div>
       </div>
-      <div class="platform-card">
+      <div class="platform-card rpi">
+        <div class="platform-stripe"></div>
         <img src="images/raspberrypi.jpg" alt="Raspberry Pi" loading="lazy" />
         <div class="platform-info">
           <p class="platform-name">Raspberry Pi</p>
@@ -417,9 +597,9 @@
 
   <!-- SLIDE 3 — My Story -->
   <section class="slide" id="slide-3" data-index="2">
-    <p class="slide-tag">My Story</p>
-    <h2 class="slide-title">How It <span class="accent">All Started</span></h2>
-    <div class="divider"></div>
+    <p class="slide-tag purple">My Story</p>
+    <h2 class="slide-title">How It <span class="accent-p">All Started</span></h2>
+    <div class="divider purple"></div>
     <div class="story-layout">
       <div class="story-image">
         <img src="images/team.jpg" alt="Brave Organization workshop" />
@@ -446,16 +626,26 @@
 
   <!-- SLIDE 4 — Competition -->
   <section class="slide" id="slide-4" data-index="3">
-    <p class="slide-tag">Competition</p>
-    <h2 class="slide-title">The <span class="accent">Sumo Robot</span> Competition</h2>
-    <div class="divider"></div>
+    <p class="slide-tag amber">Competition</p>
+    <h2 class="slide-title">The <span class="accent-amber">Sumo Robot</span> Competition</h2>
+    <div class="divider amber"></div>
     <div class="competition-layout">
       <div class="comp-images">
-        <img src="images/image1.jpg" alt="Competition photo 1" />
-        <img src="images/team.jpg"   alt="Competition photo 2" />
-        <img src="images/trophi.jpg" alt="Championship trophy"  />
+        <div class="comp-img-wrap">
+          <img src="images/image1.jpg" alt="Competition photo" />
+          <div class="comp-img-caption">THE ARENA</div>
+        </div>
+        <div class="comp-img-wrap">
+          <img src="images/team.jpg" alt="Team photo" />
+          <div class="comp-img-caption">MY TEAM</div>
+        </div>
+        <div class="comp-img-wrap">
+          <img src="images/trophi.jpg" alt="Championship trophy" />
+          <div class="comp-img-caption">OUR TROPHY</div>
+        </div>
       </div>
       <div class="comp-video">
+        <p class="comp-video-label">▶ MATCH HIGHLIGHTS</p>
         <video id="comp-video" muted loop playsinline preload="metadata" controls onvolumechange="this.muted=true">
           <source src="images/competition-video.mp4" type="video/mp4" />
           Your browser does not support the video tag.
@@ -477,12 +667,12 @@
 
   <!-- SLIDE 5 — Quiz -->
   <section class="slide" id="slide-5" data-index="4">
-    <p class="slide-tag">Interactive</p>
-    <h2 class="slide-title">Quick <span class="accent">Quiz!</span></h2>
-    <div class="divider"></div>
+    <p class="slide-tag green">Interactive</p>
+    <h2 class="slide-title">Quick <span class="accent-green">Quiz!</span></h2>
+    <div class="divider green"></div>
     <div class="quiz-container">
       <div class="quiz-q">
-        <p class="q-label">Question 01</p>
+        <p class="q-label">Question 01 / 02</p>
         <p class="q-text">Speed or Torque — which matters more in a Sumo Robot fight, and why?</p>
         <div class="q-options">
           <button class="q-option" data-q="1" data-choice="speed">⚡ Speed</button>
@@ -491,12 +681,12 @@
         <div class="q-explanation" id="q1-explanation"></div>
       </div>
       <div class="quiz-q">
-        <p class="q-label">Question 02</p>
+        <p class="q-label">Question 02 / 02</p>
         <p class="q-text">You want to build an IoT robot. Which platform do you choose?</p>
         <div class="q-options">
-          <button class="q-option" data-q="2" data-choice="arduino">Arduino Uno</button>
-          <button class="q-option" data-q="2" data-choice="esp32">ESP32</button>
-          <button class="q-option" data-q="2" data-choice="rpi">Raspberry Pi</button>
+          <button class="q-option" data-q="2" data-choice="arduino">🔵 Arduino Uno</button>
+          <button class="q-option" data-q="2" data-choice="esp32">📡 ESP32</button>
+          <button class="q-option" data-q="2" data-choice="rpi">🍓 Raspberry Pi</button>
         </div>
         <div class="q-explanation" id="q2-explanation"></div>
       </div>
@@ -510,33 +700,38 @@
     <div class="divider"></div>
     <div class="learnings-container">
       <div class="learning-item" data-delay="0">
-        <div class="learning-num">01</div>
+        <div class="learning-icon-wrap">💡</div>
         <p class="learning-text"><strong>Start simple</strong> — even an LED blink is a great beginning. Every expert started there.</p>
       </div>
-      <div class="learning-item" data-delay="180">
-        <div class="learning-num">02</div>
-        <p class="learning-text"><strong>Function over looks</strong> — our "ugly" robot beat every polished competitor.</p>
+      <div class="learning-item" data-delay="200">
+        <div class="learning-icon-wrap">⚙️</div>
+        <p class="learning-text"><strong>Function over looks</strong> — our "ugly" robot beat every polished competitor on the field.</p>
       </div>
-      <div class="learning-item" data-delay="360">
-        <div class="learning-num">03</div>
-        <p class="learning-text"><strong>Don't fear competition</strong> — even as a beginner, showing up is half the battle.</p>
+      <div class="learning-item" data-delay="400">
+        <div class="learning-icon-wrap">🏆</div>
+        <p class="learning-text"><strong>Don't fear competition</strong> — even as a beginner, showing up is already half the battle.</p>
       </div>
-      <div class="learning-item" data-delay="540">
-        <div class="learning-num">04</div>
+      <div class="learning-item" data-delay="600">
+        <div class="learning-icon-wrap">🤝</div>
         <p class="learning-text"><strong>Leadership matters</strong> — I led the team, and coordination was as important as the code.</p>
       </div>
     </div>
     <div class="closing-quote-box" id="closing-box">
       <p class="closing-quote">
-        "Robotics didn't just teach me how to build machines —<br />
-        it taught me how to <span class="accent">think</span>, <span class="accent">lead</span>,
-        and fall in love with <span class="accent">programming</span>."
+        "Robotics didn't just teach me how to build machines —<br/>
+        it taught me how to <span class="accent">think</span>, <span class="accent-p">lead</span>,
+        and fall in love with <span class="accent-green">programming</span>."
       </p>
     </div>
   </section>
 
   <!-- SLIDE 7 — Thank You -->
   <section class="slide" id="slide-7" data-index="6">
+    <div class="thankyou-rings" aria-hidden="true">
+      <div class="ring ring-1"></div>
+      <div class="ring ring-2"></div>
+      <div class="ring ring-3"></div>
+    </div>
     <div class="thankyou-wrap">
       <p class="thankyou-tag">End of Presentation</p>
       <h2 class="thankyou-title">Thank You</h2>
@@ -567,11 +762,14 @@ const Particles = (() => {
 
   function init() {
     resize();
-    dots = Array.from({ length: 50 }, () => ({
-      x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-      r: Math.random() * 1.3 + 0.3,
-      vx: (Math.random() - 0.5) * 0.22, vy: (Math.random() - 0.5) * 0.22,
-      a: Math.random() * 0.35 + 0.1, hue: Math.random() > 0.8 ? 260 : 195,
+    dots = Array.from({ length: 55 }, () => ({
+      x:  Math.random() * canvas.width,
+      y:  Math.random() * canvas.height,
+      r:  Math.random() * 1.4 + 0.3,
+      vx: (Math.random() - 0.5) * 0.2,
+      vy: (Math.random() - 0.5) * 0.2,
+      a:  Math.random() * 0.3 + 0.08,
+      hue: Math.random() > 0.75 ? 258 : 193,
     }));
     window.addEventListener('resize', resize);
     loop();
@@ -585,7 +783,7 @@ const Particles = (() => {
       if (d.y < 0) d.y = canvas.height; if (d.y > canvas.height) d.y = 0;
       ctx.beginPath();
       ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-      ctx.fillStyle = `hsla(${d.hue},100%,70%,${d.a})`;
+      ctx.fillStyle = `hsla(${d.hue},100%,72%,${d.a})`;
       ctx.fill();
     });
     requestAnimationFrame(loop);
@@ -637,7 +835,7 @@ const Quiz = (() => {
   const DATA = {
     1: {
       torque: { cls: 'correct', text: '✅ <strong>Torque wins.</strong> In Sumo you push — raw force, not speed. High-torque motors keep the robot planted and dominate the duel.' },
-      speed:  { cls: 'neutral', text: '⚡ Speed helps with the initial charge, but without torque a fast robot just bounces off. Torque is what decides Sumo matches.' },
+      speed:  { cls: 'neutral', text: '⚡ Speed helps with the initial charge, but without torque a fast robot just bounces off. Torque decides Sumo matches.' },
     },
     2: {
       arduino: { cls: 'neutral', text: '🔶 Arduino is great for learning but has <strong>no built-in Wi-Fi</strong>. You\'d need extra shields for IoT — more cost and complexity.' },
@@ -649,7 +847,9 @@ const Quiz = (() => {
   function answer(qNum, choice, btn) {
     if (answered[qNum]) return;
     answered[qNum] = choice;
-    btn.closest('.quiz-q').querySelectorAll('.q-option').forEach(b => (b.disabled = true));
+    const qBox = btn.closest('.quiz-q');
+    qBox.querySelectorAll('.q-option').forEach(b => (b.disabled = true));
+    qBox.classList.add('answered');
     btn.classList.add(DATA[qNum][choice].cls);
     const exp = document.getElementById(`q${qNum}-explanation`);
     exp.innerHTML = DATA[qNum][choice].text;
@@ -667,7 +867,7 @@ const Learnings = (() => {
     document.querySelectorAll('.learning-item').forEach(item => {
       setTimeout(() => item.classList.add('revealed'), parseInt(item.dataset.delay || 0, 10));
     });
-    setTimeout(() => document.getElementById('closing-box').classList.add('revealed'), 850);
+    setTimeout(() => document.getElementById('closing-box').classList.add('revealed'), 950);
   }
   function reset() {
     triggered = false;
@@ -685,18 +885,20 @@ const Presentation = (() => {
   const btnPrev  = document.getElementById('btn-prev');
   const btnNext  = document.getElementById('btn-next');
   const curEl    = document.getElementById('cur');
+  const nameEl   = document.getElementById('slide-name');
   const video    = document.getElementById('comp-video');
   let current    = 0;
   let dots       = [];
 
   const pad = n => String(n).padStart(2, '0');
+  const NAMES = ['HERO', 'ROBOTICS', 'MY STORY', 'COMPETITION', 'QUIZ', 'LEARNINGS', 'END'];
 
   function buildDots() {
     const bar = document.getElementById('topbar');
     dots = slides.map((_, i) => {
       const b = document.createElement('button');
       b.className = 'dot-nav' + (i === 0 ? ' active' : '');
-      b.setAttribute('aria-label', `Slide ${i + 1}`);
+      b.setAttribute('aria-label', `Slide ${i + 1}: ${NAMES[i]}`);
       b.addEventListener('click', () => goTo(i));
       bar.appendChild(b);
       return b;
@@ -711,7 +913,7 @@ const Presentation = (() => {
 
     prevSlide.classList.remove('active');
     prevSlide.classList.add('exit-left');
-    setTimeout(() => prevSlide.classList.remove('exit-left'), 520);
+    setTimeout(() => prevSlide.classList.remove('exit-left'), 500);
 
     if (prevIndex === 3 && video) video.pause();
     if (prevIndex === 5) Learnings.reset();
@@ -726,6 +928,7 @@ const Presentation = (() => {
     entering.classList.add('active');
 
     curEl.textContent    = pad(current + 1);
+    nameEl.textContent   = NAMES[current];
     progress.style.width = `${((current + 1) / total) * 100}%`;
     btnPrev.disabled     = current === 0;
     btnNext.disabled     = current === total - 1;
