@@ -527,6 +527,38 @@
     .thankyou-question { font-size: clamp(1rem, 2.5vw, 1.4rem); color: var(--muted); letter-spacing: 3.5px; text-transform: uppercase; font-weight: 300; }
     .thankyou-name { font-family: 'Orbitron', sans-serif; font-size: clamp(0.58rem, 1.2vw, 0.78rem); color: var(--muted); letter-spacing: 3px; opacity: 0.55; }
 
+    /* ══ Lightbox ══ */
+    #lightbox {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.92); backdrop-filter: blur(14px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.28s cubic-bezier(.4,0,.2,1);
+    }
+    #lightbox.open { opacity: 1; pointer-events: all; }
+    #lightbox-img {
+      max-width: 90vw; max-height: 88vh;
+      object-fit: contain; border-radius: 12px;
+      box-shadow: 0 0 80px rgba(0,212,255,0.18), 0 24px 80px rgba(0,0,0,0.7);
+      transform: scale(0.9);
+      transition: transform 0.28s cubic-bezier(.34,1.56,.64,1);
+      border: 1px solid rgba(0,212,255,0.2);
+    }
+    #lightbox.open #lightbox-img { transform: scale(1); }
+    #lightbox-close {
+      position: absolute; top: 20px; right: 24px;
+      background: rgba(15,25,50,0.85); backdrop-filter: blur(10px);
+      border: 1px solid var(--border); color: var(--text);
+      font-size: 1.4rem; width: 40px; height: 40px;
+      border-radius: 50%; cursor: pointer; line-height: 1;
+      transition: border-color 0.2s, color 0.2s, transform 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #lightbox-close:hover { border-color: var(--blue); color: var(--blue); transform: scale(1.1); }
+
+    /* mark zoomable images with a cursor hint */
+    .zoomable { cursor: zoom-in; }
+
     /* ══ Responsive ══ */
     @media (max-width: 768px) {
       .slide          { padding: var(--top-chrome) 16px var(--bottom-chrome); }
@@ -755,6 +787,12 @@
 
 </div>
 
+<!-- Lightbox -->
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Image fullscreen view">
+  <button id="lightbox-close" aria-label="Close">&times;</button>
+  <img id="lightbox-img" src="" alt="" />
+</div>
+
 <nav id="nav" aria-label="Slide navigation">
   <button class="nav-btn" id="btn-prev" disabled>&#8592; Prev</button>
   <button class="nav-btn" id="btn-next">Next &#8594;</button>
@@ -957,6 +995,37 @@ const Presentation = (() => {
   }
 
   return { init, prev: () => goTo(current - 1), next: () => goTo(current + 1) };
+})();
+
+/* ── Lightbox ── */
+const Lightbox = (() => {
+  const box   = document.getElementById('lightbox');
+  const img   = document.getElementById('lightbox-img');
+  const close = document.getElementById('lightbox-close');
+
+  function open(src, alt) {
+    img.src = src;
+    img.alt = alt || '';
+    box.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function shut() {
+    box.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => { img.src = ''; }, 300);
+  }
+
+  close.addEventListener('click', shut);
+  box.addEventListener('click', e => { if (e.target === box) shut(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') shut(); });
+
+  /* attach to every image that should be zoomable */
+  document.querySelectorAll('.platform-card img, .story-image img, .comp-img-wrap img').forEach(el => {
+    el.classList.add('zoomable');
+    el.addEventListener('click', () => open(el.src, el.alt));
+  });
+
+  return { open, shut };
 })();
 
 /* ── Bind buttons ── */
