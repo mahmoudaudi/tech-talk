@@ -242,10 +242,32 @@
     .stat-key  { font-size: .52rem; color: var(--muted); letter-spacing: 2.5px; text-transform: uppercase; }
     .stat-sep  { width: 1px; height: 28px; background: var(--border); }
 
+    /* hero bottom row: robot image + poll card side by side */
+    .hero-bottom {
+      position: relative; z-index: 2;
+      display: flex; gap: 16px; align-items: stretch;
+      max-width: 840px; width: 100%;
+    }
+    .hero-robot-frame {
+      flex: 0 0 42%; border-radius: 16px; overflow: hidden;
+      border: 1px solid rgba(0,212,255,.2);
+      box-shadow: 0 0 40px rgba(0,212,255,.14), 0 0 80px rgba(251,146,60,.06), 0 12px 44px rgba(0,0,0,.55);
+      position: relative;
+    }
+    .hero-robot-frame::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(180deg, transparent 55%, rgba(7,11,18,.72) 100%);
+      pointer-events: none;
+    }
+    .hero-robot-frame img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      min-height: 160px; cursor: zoom-in;
+    }
+
     /* poll card with animated gradient border */
     .question-wrap {
-      position: relative; z-index: 2;
-      padding: 1.5px; border-radius: 22px; max-width: 500px; width: 100%;
+      position: relative; z-index: 2; flex: 1 1 0; min-width: 0;
+      padding: 1.5px; border-radius: 22px;
       background: linear-gradient(135deg, rgba(0,212,255,.5), rgba(129,140,248,.5), rgba(0,212,255,.5));
       background-size: 300% 300%;
       animation: q-border 4s ease-in-out infinite;
@@ -634,11 +656,14 @@
 
     /* ── Responsive ── */
     @media (max-width: 768px) {
-      .slide          { padding: var(--TC) 16px var(--BC); }
-      .platforms-grid { grid-template-columns: 1fr; }
-      .story-layout   { grid-template-columns: 1fr; }
-      .comp-info      { grid-template-columns: 1fr; }
-      .hero-stats     { gap: 12px; padding: 8px 16px; }
+      .slide            { padding: var(--TC) 16px var(--BC); }
+      .platforms-grid   { grid-template-columns: 1fr; }
+      .story-layout     { grid-template-columns: 1fr; }
+      .comp-info        { grid-template-columns: 1fr; }
+      .hero-stats       { gap: 12px; padding: 8px 16px; }
+      .hero-bottom      { flex-direction: column; }
+      .hero-robot-frame { flex: 0 0 auto; max-height: 180px; }
+      .hero-robot-frame img { min-height: unset; max-height: 180px; }
     }
     @media (max-width: 500px) {
       .vote-buttons { flex-direction: column; align-items: center; }
@@ -688,15 +713,20 @@
       <div class="hero-stat"><span class="stat-val">🥇</span><span class="stat-key">Champion</span></div>
     </div>
 
-    <div class="question-wrap">
-      <div class="question-box">
-        <p class="poll-label">▾ Audience Poll</p>
-        <p class="question-text">Have you ever built something that actually <span class="accent">moved</span>?</p>
-        <div class="vote-buttons">
-          <button class="vote-btn yes" data-vote="yes">YES</button>
-          <button class="vote-btn no"  data-vote="no">NO</button>
+    <div class="hero-bottom">
+      <div class="hero-robot-frame">
+        <img src="images/1st slide.png" alt="Sumo robots competing in the arena" />
+      </div>
+      <div class="question-wrap">
+        <div class="question-box">
+          <p class="poll-label">▾ Audience Poll</p>
+          <p class="question-text">Have you ever built something that actually <span class="accent">moved</span>?</p>
+          <div class="vote-buttons">
+            <button class="vote-btn yes" data-vote="yes">YES</button>
+            <button class="vote-btn no"  data-vote="no">NO</button>
+          </div>
+          <div class="vote-results" id="vote-results" aria-live="polite"></div>
         </div>
-        <div class="vote-results" id="vote-results" aria-live="polite"></div>
       </div>
     </div>
   </section>
@@ -1020,7 +1050,7 @@ const Lightbox = (() => {
   document.getElementById('lb-close').addEventListener('click', shut);
   box.addEventListener('click', e => { if (e.target === box) shut(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') shut(); });
-  document.querySelectorAll('.platform-card img, .story-image img, .comp-img-wrap img').forEach(el => {
+  document.querySelectorAll('.platform-card img, .story-image img, .comp-img-wrap img, .hero-robot-frame img').forEach(el => {
     el.classList.add('zoomable');
     el.addEventListener('click', () => open(el.src, el.alt));
   });
