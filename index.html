@@ -155,42 +155,114 @@
     /* ══════════ SLIDE 1 — Hero ══════════ */
     #slide-1 {
       background:
-        radial-gradient(ellipse 75% 55% at 50% 0%,  rgba(0,212,255,0.12) 0%, transparent 60%),
-        radial-gradient(ellipse 45% 35% at 85% 90%, rgba(129,140,248,0.08) 0%, transparent 55%),
+        radial-gradient(ellipse 80% 60% at 50% 10%,  rgba(0,212,255,0.14) 0%, transparent 58%),
+        radial-gradient(ellipse 50% 40% at 85% 88%,  rgba(129,140,248,0.1) 0%, transparent 55%),
+        radial-gradient(ellipse 35% 30% at 5%  20%,  rgba(0,212,255,0.06) 0%, transparent 50%),
         var(--bg);
+      overflow: hidden;
     }
+
+    /* decorative rings */
+    .hero-deco { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+    .hero-ring {
+      position: absolute; left: 50%; top: 44%; border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: h-ring 5s ease-in-out infinite;
+    }
+    .hero-ring-1 { width: 380px; height: 380px; border: 1px solid rgba(0,212,255,0.1); animation-delay: 0s; }
+    .hero-ring-2 { width: 620px; height: 620px; border: 1px solid rgba(129,140,248,0.07); animation-delay: 1.6s; }
+    .hero-ring-3 { width: 860px; height: 860px; border: 1px solid rgba(0,212,255,0.04); animation-delay: 3.2s; }
+    .hero-orb {
+      position: absolute; left: 50%; top: 36%; transform: translate(-50%, -50%);
+      width: 520px; height: 280px;
+      background: radial-gradient(ellipse, rgba(0,212,255,0.13) 0%, transparent 68%);
+      filter: blur(30px); animation: h-orb 6s ease-in-out infinite;
+    }
+    @keyframes h-ring {
+      0%, 100% { transform: translate(-50%,-50%) scale(1);    opacity: 0.45; }
+      50%       { transform: translate(-50%,-50%) scale(1.05); opacity: 1;    }
+    }
+    @keyframes h-orb {
+      0%, 100% { opacity: 0.55; }
+      50%       { opacity: 1;    }
+    }
+
+    /* corner tech brackets */
+    .hero-bracket {
+      position: absolute; width: 28px; height: 28px; pointer-events: none;
+      border-color: rgba(0,212,255,0.25); border-style: solid;
+    }
+    .hero-bracket-tl { top: 14px; left: 18px; border-width: 2px 0 0 2px; }
+    .hero-bracket-tr { top: 14px; right: 18px; border-width: 2px 2px 0 0; }
+    .hero-bracket-bl { bottom: 70px; left: 18px; border-width: 0 0 2px 2px; }
+    .hero-bracket-br { bottom: 70px; right: 18px; border-width: 0 2px 2px 0; }
 
     .hero-eyebrow {
-      font-family: 'Orbitron', sans-serif; font-size: 0.55rem; letter-spacing: 5px;
+      font-family: 'Orbitron', sans-serif; font-size: 0.52rem; letter-spacing: 6px;
       color: var(--blue); text-transform: uppercase; text-align: center;
-      margin-bottom: 16px; opacity: 0.7;
+      margin-bottom: 18px; opacity: 0.75;
     }
     .hero-eyebrow span {
-      display: inline-block; width: 22px; height: 1px;
-      background: var(--blue); vertical-align: middle; margin: 0 10px; opacity: 0.5;
+      display: inline-block; width: 30px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blue)); vertical-align: middle; margin: 0 12px; opacity: 0.6;
     }
+    .hero-eyebrow span:last-child { background: linear-gradient(90deg, var(--blue), transparent); }
 
     .hero-title {
-      font-family: 'Orbitron', sans-serif; font-size: clamp(2.2rem, 6.5vw, 5rem);
+      font-family: 'Orbitron', sans-serif; font-size: clamp(2.4rem, 7vw, 5.5rem);
       font-weight: 900; text-align: center; line-height: 1.06;
-      background: linear-gradient(140deg, #ffffff 15%, var(--blue) 55%, var(--purple) 100%);
+      background: linear-gradient(140deg, #ffffff 0%, #ffffff 20%, var(--blue) 55%, var(--purple) 85%, #ffffff 100%);
+      background-size: 250% 250%;
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      margin-bottom: 14px; letter-spacing: -1.5px;
+      margin-bottom: 14px; letter-spacing: -2px;
+      animation: title-shift 6s ease-in-out infinite;
+      filter: drop-shadow(0 0 28px rgba(0,212,255,0.18));
     }
+    @keyframes title-shift {
+      0%, 100% { background-position: 0%   50%; }
+      50%       { background-position: 100% 50%; }
+    }
+
     .hero-sub {
-      font-size: clamp(0.76rem, 1.7vw, 0.94rem); color: var(--muted);
-      text-align: center; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 40px;
+      font-size: clamp(0.74rem, 1.6vw, 0.92rem); color: var(--muted);
+      text-align: center; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 28px;
+    }
+
+    /* stats row */
+    .hero-stats {
+      display: flex; align-items: center; gap: 20px;
+      background: rgba(10,17,35,0.75); backdrop-filter: blur(16px);
+      border: 1px solid rgba(30,41,59,0.9); border-radius: 100px;
+      padding: 10px 28px; margin-bottom: 28px;
+    }
+    .hero-stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .stat-val { font-family: 'Orbitron', sans-serif; font-size: 0.88rem; color: var(--bright); font-weight: 700; }
+    .stat-key { font-size: 0.55rem; color: var(--muted); letter-spacing: 2.5px; text-transform: uppercase; }
+    .stat-div { width: 1px; height: 30px; background: var(--border); }
+
+    /* question box with animated gradient border */
+    .question-box-wrap {
+      padding: 1.5px; border-radius: 23px; max-width: 520px; width: 100%;
+      background: linear-gradient(135deg, rgba(0,212,255,0.55), rgba(129,140,248,0.55), rgba(0,212,255,0.55));
+      background-size: 300% 300%;
+      animation: q-border 4s ease-in-out infinite;
+      box-shadow: 0 0 40px rgba(0,212,255,0.12), 0 0 80px rgba(129,140,248,0.08);
+    }
+    @keyframes q-border {
+      0%, 100% { background-position: 0%   50%; }
+      50%       { background-position: 100% 50%; }
     }
 
     .question-box {
-      background: var(--surface); backdrop-filter: blur(24px);
-      border: 1px solid rgba(30,41,59,0.7); border-radius: 22px;
-      padding: 30px 38px; text-align: center; max-width: 520px; width: 100%;
-      box-shadow: 0 0 0 1px rgba(0,212,255,0.04), inset 0 1px 0 rgba(255,255,255,0.04);
-      transition: border-color 0.3s, box-shadow 0.3s;
+      background: rgba(10,17,35,0.96); backdrop-filter: blur(24px);
+      border-radius: 22px;
+      padding: 28px 36px; text-align: center; width: 100%;
     }
-    .question-box:hover { border-color: rgba(0,212,255,0.15); box-shadow: 0 0 30px rgba(0,212,255,0.06); }
-    .question-text { font-size: clamp(0.95rem, 1.9vw, 1.18rem); color: var(--bright); margin-bottom: 24px; font-weight: 500; line-height: 1.65; }
+    .poll-label {
+      font-family: 'Orbitron', sans-serif; font-size: 0.48rem; letter-spacing: 4px;
+      color: var(--blue); margin-bottom: 14px; opacity: 0.8; text-transform: uppercase;
+    }
+    .question-text { font-size: clamp(0.95rem, 1.9vw, 1.15rem); color: var(--bright); margin-bottom: 22px; font-weight: 500; line-height: 1.65; }
 
     .vote-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
     .vote-btn {
@@ -591,16 +663,49 @@
 
   <!-- SLIDE 1 — Hero -->
   <section class="slide active" id="slide-1" data-index="0">
+    <!-- decorative background -->
+    <div class="hero-deco" aria-hidden="true">
+      <div class="hero-orb"></div>
+      <div class="hero-ring hero-ring-1"></div>
+      <div class="hero-ring hero-ring-2"></div>
+      <div class="hero-ring hero-ring-3"></div>
+      <div class="hero-bracket hero-bracket-tl"></div>
+      <div class="hero-bracket hero-bracket-tr"></div>
+      <div class="hero-bracket hero-bracket-bl"></div>
+      <div class="hero-bracket hero-bracket-br"></div>
+    </div>
+
     <p class="hero-eyebrow"><span></span>CS Student Presentation<span></span></p>
     <h1 class="hero-title">My Robotics<br/>Journey</h1>
     <p class="hero-sub">From a blinking LED to a championship robot</p>
-    <div class="question-box">
-      <p class="question-text">Have you ever built something that actually <span class="accent">moved</span>?</p>
-      <div class="vote-buttons">
-        <button class="vote-btn yes" data-vote="yes">YES</button>
-        <button class="vote-btn no"  data-vote="no">NO</button>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="stat-val">2+</span>
+        <span class="stat-key">Years</span>
       </div>
-      <div class="vote-results" id="vote-results" aria-live="polite"></div>
+      <span class="stat-div"></span>
+      <div class="hero-stat">
+        <span class="stat-val">Arduino</span>
+        <span class="stat-key">Platform</span>
+      </div>
+      <span class="stat-div"></span>
+      <div class="hero-stat">
+        <span class="stat-val">🥇</span>
+        <span class="stat-key">Champion</span>
+      </div>
+    </div>
+
+    <div class="question-box-wrap">
+      <div class="question-box">
+        <p class="poll-label">▾ Audience Poll</p>
+        <p class="question-text">Have you ever built something that actually <span class="accent">moved</span>?</p>
+        <div class="vote-buttons">
+          <button class="vote-btn yes" data-vote="yes">YES</button>
+          <button class="vote-btn no"  data-vote="no">NO</button>
+        </div>
+        <div class="vote-results" id="vote-results" aria-live="polite"></div>
+      </div>
     </div>
   </section>
 
