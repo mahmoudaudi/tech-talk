@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Robotics Journey</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #070b12;
+      --surface:    rgba(15, 23, 42, 0.85);
+      --surface-s:  rgba(22, 33, 56, 0.7);
+      --border:     rgba(30, 41, 59, 0.8);
+      --border-h:   rgba(0, 212, 255, 0.35);
+      --blue:       #00d4ff;
+      --blue-soft:  rgba(0, 212, 255, 0.12);
+      --blue-glow:  rgba(0, 212, 255, 0.3);
+      --purple:     #818cf8;
+      --purple-d:   #6366f1;
+      --text:       #cbd5e1;
+      --text-bright:#f1f5f9;
+      --muted:      #475569;
+      --green:      #34d399;
+      --amber:      #fbbf24;
+      --red:        #f87171;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* ── Dot-grid background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle, rgba(0,212,255,0.08) 1px, transparent 1px);
+      background-size: 36px 36px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Particles canvas ── */
+    #particles-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.4;
+    }
+
+    /* ── Progress bar ── */
+    #progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--blue), var(--purple));
+      transition: width 0.55s cubic-bezier(.4,0,.2,1);
+      z-index: 100;
+      box-shadow: 0 0 12px var(--blue);
+    }
+
+    /* ── Top bar ── */
+    #topbar {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .dot-nav {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+      cursor: pointer;
+      transition: background 0.25s, transform 0.25s, box-shadow 0.25s;
+      border: none;
+    }
+    .dot-nav.active {
+      background: var(--blue);
+      transform: scale(1.4);
+      box-shadow: 0 0 8px var(--blue);
+    }
+
+    /* ── Slide counter (top-right) ── */
+    #slide-counter {
+      position: fixed;
+      top: 14px; right: 20px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      z-index: 100;
+    }
+    #slide-counter span { color: var(--blue); }
+
+    /* ── Navigation buttons ── */
+    #nav {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 100;
+    }
+
+    .nav-btn {
+      padding: 8px 24px;
+      background: rgba(7,11,18,0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 2px;
+      cursor: pointer;
+      border-radius: 100px;
+      transition: all 0.22s cubic-bezier(.4,0,.2,1);
+    }
+    .nav-btn:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+      box-shadow: 0 0 14px var(--blue-glow);
+    }
+    .nav-btn:disabled { opacity: 0.2; pointer-events: none; }
+
+    /* ══════════════════════════════════════════
+       SLIDE SYSTEM
+    ══════════════════════════════════════════ */
+    #slides-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 50px 40px 68px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s cubic-bezier(.4,0,.2,1),
+                  transform 0.5s cubic-bezier(.4,0,.2,1);
+      transform: translateX(48px);
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .slide::-webkit-scrollbar { width: 4px; }
+    .slide::-webkit-scrollbar-track { background: transparent; }
+    .slide::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .slide::before, .slide::after {
+      content: '';
+      flex: 1 0 0;
+      min-height: 0;
+    }
+
+    .slide > * { position: relative; z-index: 2; }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(0);
+    }
+    .slide.exit-left {
+      opacity: 0;
+      transform: translateX(-48px);
+    }
+
+    /* ── Shared: slide header ── */
+    .slide-tag {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.55rem;
+      letter-spacing: 3px;
+      color: var(--blue);
+      background: var(--blue-soft);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 100px;
+      padding: 4px 14px;
+      margin-bottom: 12px;
+      display: inline-block;
+      text-transform: uppercase;
+    }
+
+    .slide-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+      font-weight: 900;
+      color: var(--text-bright);
+      text-align: center;
+      margin-bottom: 6px;
+      line-height: 1.15;
+    }
+
+    .accent { color: var(--blue); }
+
+    .divider {
+      width: 60px;
+      height: 1.5px;
+      background: linear-gradient(90deg, transparent, var(--blue), transparent);
+      margin: 0 auto 22px;
+    }
+
+    /* ── Glass card ── */
+    .glass {
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+    .glass:hover { border-color: var(--border-h); }
+
+    /* ══════════════════════════════════════════
+       SLIDE 1 — Hero
+    ══════════════════════════════════════════ */
+    #slide-1 {
+      background:
+        radial-gradient(ellipse 70% 55% at 50% -5%,
+          rgba(0,212,255,0.1) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 40% at 80% 80%,
+          rgba(99,102,241,0.07) 0%, transparent 60%),
+        var(--bg);
+    }
+
+    .hero-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2rem, 6vw, 4.2rem);
+      font-weight: 900;
+      text-align: center;
+      line-height: 1.08;
+      background: linear-gradient(135deg, #fff 30%, var(--blue) 75%, var(--purple) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+      letter-spacing: -1px;
+    }
+
+    .hero-sub {
+      font-size: clamp(0.8rem, 1.8vw, 0.98rem);
+      color: var(--muted);
+      text-align: center;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 44px;
+    }
+
+    .question-box {
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 30px 36px;
+      text-align: center;
+      max-width: 520px;
+      width: 100%;
+      transition: border-color 0.3s;
+    }
+    .question-box:hover { border-color: var(--border-h); }
+
+    .question-text {
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      color: var(--text-bright);
+      margin-bottom: 24px;
+      font-weight: 500;
+      line-height: 1.55;
+    }
+
+    .vote-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+    .vote-btn {
+      padding: 11px 40px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      border-radius: 100px;
+      cursor: pointer;
+      border: 1.5px solid;
+      transition: all 0.22s cubic-bezier(.4,0,.2,1);
+      font-weight: 700;
+    }
+    .vote-btn.yes { background: transparent; border-color: var(--green); color: var(--green); }
+    .vote-btn.yes:hover, .vote-btn.yes.voted {
+      background: var(--green); color: #070b12;
+      box-shadow: 0 0 22px rgba(52,211,153,0.4);
+    }
+    .vote-btn.no { background: transparent; border-color: var(--red); color: var(--red); }
+    .vote-btn.no:hover, .vote-btn.no.voted {
+      background: var(--red); color: #070b12;
+      box-shadow: 0 0 22px rgba(248,113,113,0.4);
+    }
+
+    .vote-results {
+      margin-top: 20px;
+      min-height: 52px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .vote-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.8rem;
+    }
+    .vote-bar-label { width: 28px; font-family: 'Orbitron', sans-serif; font-size: 0.6rem; letter-spacing: 1px; }
+    .vote-bar-label.yes { color: var(--green); }
+    .vote-bar-label.no  { color: var(--red); }
+    .vote-bar-track {
+      flex: 1;
+      height: 5px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .vote-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      transition: width 0.5s cubic-bezier(.4,0,.2,1);
+    }
+    .vote-bar-fill.yes { background: var(--green); }
+    .vote-bar-fill.no  { background: var(--red); }
+    .vote-bar-count { width: 28px; text-align: right; font-weight: 600; font-size: 0.82rem; }
+    .vote-bar-count.yes { color: var(--green); }
+    .vote-bar-count.no  { color: var(--red); }
+
+    /* ══════════════════════════════════════════
+       SLIDE 2 — Robotics
+    ══════════════════════════════════════════ */
+    .definition-box {
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border-left: 3px solid var(--blue);
+      border-radius: 10px;
+      padding: 14px 20px;
+      max-width: 820px;
+      width: 100%;
+      margin-bottom: 18px;
+      font-size: 0.87rem;
+      line-height: 1.75;
+      color: var(--text);
+    }
+
+    .platforms-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      width: 100%;
+      max-width: 820px;
+    }
+
+    .platform-card {
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: transform 0.25s cubic-bezier(.4,0,.2,1),
+                  box-shadow 0.25s, border-color 0.25s;
+      cursor: default;
+    }
+    .platform-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 36px rgba(0,212,255,0.15);
+      border-color: var(--border-h);
+    }
+    .platform-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      display: block;
+      background: var(--border);
+    }
+    .platform-info { padding: 12px 16px; }
+    .platform-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.72rem;
+      color: var(--blue);
+      margin-bottom: 5px;
+      letter-spacing: 1px;
+    }
+    .platform-desc { font-size: 0.74rem; color: var(--muted); line-height: 1.55; }
+
+    /* ══════════════════════════════════════════
+       SLIDE 3 — My Story
+    ══════════════════════════════════════════ */
+    .story-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      gap: 28px;
+      max-width: 860px;
+      width: 100%;
+      align-items: start;
+    }
+
+    .story-image {
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 40px rgba(0,212,255,0.12);
+    }
+    .story-image img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .story-content { display: flex; flex-direction: column; gap: 0; }
+
+    .story-step {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding-bottom: 18px;
+      position: relative;
+    }
+
+    /* vertical timeline line */
+    .story-step:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 14px;
+      top: 32px;
+      width: 1.5px;
+      bottom: 0;
+      background: linear-gradient(to bottom, var(--blue), transparent);
+      opacity: 0.3;
+    }
+
+    .step-num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.6rem;
+      color: var(--blue);
+      background: var(--blue-soft);
+      border: 1px solid rgba(0,212,255,0.25);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-text { font-size: 0.85rem; line-height: 1.65; color: var(--text); padding-top: 4px; }
+    .step-text strong { color: var(--blue); font-weight: 600; }
+
+    .quote-box {
+      background: rgba(0,212,255,0.04);
+      border: 1px solid rgba(0,212,255,0.15);
+      border-radius: 10px;
+      padding: 14px 18px 14px 22px;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: var(--text-bright);
+      line-height: 1.65;
+      position: relative;
+      margin-top: 4px;
+    }
+    .quote-box::before {
+      content: '"';
+      position: absolute;
+      top: -10px;
+      left: 14px;
+      font-size: 3rem;
+      color: var(--blue);
+      opacity: 0.2;
+      font-style: normal;
+      line-height: 1;
+    }
+
+    /* ══════════════════════════════════════════
+       SLIDE 4 — Competition
+    ══════════════════════════════════════════ */
+    .competition-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .comp-images {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      width: 100%;
+    }
+    .comp-images img {
+      width: 100%;
+      height: auto;
+      max-height: 200px;
+      object-fit: scale-down;
+      display: block;
+      border-radius: 10px;
+      transition: transform 0.25s cubic-bezier(.4,0,.2,1), box-shadow 0.25s;
+      background: transparent;
+    }
+    .comp-images img:hover {
+      transform: scale(1.03);
+      box-shadow: 0 8px 28px rgba(0,212,255,0.2);
+    }
+
+    .comp-video video {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      display: block;
+    }
+
+    .comp-info {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .comp-fact {
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.55;
+      color: var(--text);
+      transition: border-color 0.22s;
+    }
+    .comp-fact:hover { border-color: var(--border-h); }
+    .fact-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+    .win-badge {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: 2px;
+      color: var(--amber);
+      background: rgba(251,191,36,0.08);
+      border: 1px solid rgba(251,191,36,0.35);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 0 20px rgba(251,191,36,0.08);
+    }
+
+    /* ══════════════════════════════════════════
+       SLIDE 5 — Quiz
+    ══════════════════════════════════════════ */
+    .quiz-container {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .quiz-q {
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 22px;
+      transition: border-color 0.22s;
+    }
+    .quiz-q:focus-within { border-color: var(--border-h); }
+
+    .q-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.55rem;
+      color: var(--blue);
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+      opacity: 0.8;
+    }
+
+    .q-text {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-bright);
+      margin-bottom: 16px;
+      line-height: 1.55;
+    }
+
+    .q-options { display: flex; flex-wrap: wrap; gap: 9px; }
+
+    .q-option {
+      padding: 8px 20px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.83rem;
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(.4,0,.2,1);
+      font-weight: 500;
+    }
+    .q-option:hover:not(:disabled) {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: var(--blue-soft);
+    }
+    .q-option.correct {
+      border-color: var(--green);
+      background: rgba(52,211,153,0.1);
+      color: var(--green);
+    }
+    .q-option.neutral {
+      border-color: var(--blue);
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+    .q-option:disabled { cursor: default; }
+
+    .q-explanation {
+      margin-top: 14px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      background: rgba(0,212,255,0.04);
+      border-left: 2px solid var(--blue);
+      font-size: 0.81rem;
+      color: var(--text);
+      line-height: 1.65;
+      display: none;
+      animation: fadeSlideIn 0.3s ease forwards;
+    }
+    .q-explanation.visible { display: block; }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ══════════════════════════════════════════
+       SLIDE 6 — Learnings
+    ══════════════════════════════════════════ */
+    .learnings-container {
+      max-width: 680px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .learning-item {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 18px;
+      opacity: 0;
+      transform: translateX(-22px);
+      transition: opacity 0.45s cubic-bezier(.4,0,.2,1),
+                  transform 0.45s cubic-bezier(.4,0,.2,1),
+                  border-color 0.22s;
+    }
+    .learning-item.revealed { opacity: 1; transform: translateX(0); }
+    .learning-item:hover { border-color: var(--border-h); }
+
+    .learning-num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.6rem;
+      color: var(--blue);
+      background: var(--blue-soft);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .learning-icon { font-size: 1.25rem; flex-shrink: 0; }
+    .learning-text { font-size: 0.86rem; line-height: 1.55; color: var(--text); }
+    .learning-text strong { color: var(--text-bright); font-weight: 600; }
+
+    .closing-box {
+      background: linear-gradient(135deg,
+        rgba(0,212,255,0.06) 0%,
+        rgba(99,102,241,0.06) 100%);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0,212,255,0.18);
+      border-radius: 16px;
+      padding: 24px 30px;
+      text-align: center;
+      max-width: 680px;
+      width: 100%;
+      margin-top: 14px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.55s cubic-bezier(.4,0,.2,1),
+                  transform 0.55s cubic-bezier(.4,0,.2,1);
+    }
+    .closing-box.revealed { opacity: 1; transform: translateY(0); }
+
+    .closing-quote {
+      font-size: clamp(0.82rem, 1.6vw, 0.95rem);
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .thank-you {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.1rem, 3vw, 1.9rem);
+      font-weight: 900;
+      background: linear-gradient(90deg, var(--blue), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
+
+    .questions-text {
+      font-size: 0.82rem;
+      color: var(--muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .slide            { padding: 46px 18px 64px; }
+      .platforms-grid   { grid-template-columns: 1fr; }
+      .story-layout     { grid-template-columns: 1fr; }
+      .story-image img  { height: 200px; }
+      .comp-info        { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .vote-buttons     { flex-direction: column; align-items: center; }
+      .comp-images      { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+<div id="progress-bar"></div>
+<div id="topbar" role="tablist" aria-label="Slide navigation dots"></div>
+<div id="slide-counter"><span id="cur">01</span> / <span id="tot">06</span></div>
+
+<div id="slides-container">
+
+  <!-- ══ SLIDE 1 — Hero ══ -->
+  <section class="slide active" id="slide-1" data-index="0">
+    <h1 class="hero-title">My Robotics<br/>Journey</h1>
+    <p class="hero-sub">From a blinking LED to a championship robot</p>
+
+    <div class="question-box">
+      <p class="question-text">
+        Have you ever built something that actually <span class="accent">moved</span>?
+      </p>
+      <div class="vote-buttons">
+        <button class="vote-btn yes" data-vote="yes">YES</button>
+        <button class="vote-btn no"  data-vote="no">NO</button>
+      </div>
+      <div class="vote-results" id="vote-results" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ══ SLIDE 2 — Robotics ══ -->
+  <section class="slide" id="slide-2" data-index="1">
+    <p class="slide-tag">Introduction</p>
+    <h2 class="slide-title">What is <span class="accent">Robotics?</span></h2>
+    <div class="divider"></div>
+
+    <div class="definition-box">
+      <strong style="color:var(--text-bright)">Robotics</strong> is the branch of engineering and computer science that
+      designs, builds, and programs machines capable of carrying out tasks automatically —
+      bridging the physical and digital worlds. At its heart is a
+      <span class="accent">microcontroller</span>: the brain that reads sensors and drives actuators.
+    </div>
+
+    <div class="platforms-grid">
+      <div class="platform-card">
+        <img src="images/arduino.jpg" alt="Arduino board" loading="lazy" />
+        <div class="platform-info">
+          <p class="platform-name">Arduino Uno</p>
+          <p class="platform-desc">Open-source microcontroller. Simple C-like language, massive community. Perfect for beginners.</p>
+        </div>
+      </div>
+      <div class="platform-card">
+        <img src="images/esp32.jpg" alt="ESP32 module" loading="lazy" />
+        <div class="platform-info">
+          <p class="platform-name">ESP32</p>
+          <p class="platform-desc">Built-in Wi-Fi &amp; Bluetooth. Powerful and affordable. Ideal for IoT robots.</p>
+        </div>
+      </div>
+      <div class="platform-card">
+        <img src="images/raspberrypi.jpg" alt="Raspberry Pi" loading="lazy" />
+        <div class="platform-info">
+          <p class="platform-name">Raspberry Pi</p>
+          <p class="platform-desc">Single-board computer running a full OS. Great for vision, AI, and complex logic.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SLIDE 3 — My Story ══ -->
+  <section class="slide" id="slide-3" data-index="2">
+    <p class="slide-tag">My Story</p>
+    <h2 class="slide-title">How It <span class="accent">All Started</span></h2>
+    <div class="divider"></div>
+
+    <div class="story-layout">
+      <div class="story-image">
+        <img src="images/team.jpg" alt="Brave Organization workshop" />
+      </div>
+
+      <div class="story-content">
+        <div class="story-step">
+          <div class="step-num">01</div>
+          <p class="step-text">
+            Two years ago, as a <strong>first-year CS student</strong>,
+            I joined a robotics workshop at <strong>Brave Organization</strong>
+            — with zero hardware experience.
+          </p>
+        </div>
+        <div class="story-step">
+          <div class="step-num">02</div>
+          <p class="step-text">
+            My very first build: a simple <strong>LED circuit</strong> controlled by code.
+            No motors, no sensors — just a light blinking on command.
+          </p>
+        </div>
+        <div class="story-step">
+          <div class="step-num">03</div>
+          <p class="step-text">
+            That moment changed everything. Seeing <strong>code control real hardware</strong>
+            made programming feel tangible, powerful, and meaningful.
+          </p>
+        </div>
+        <div class="quote-box">
+          Programming stopped being abstract —
+          it became something I could <em>touch</em>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SLIDE 4 — Competition ══ -->
+  <section class="slide" id="slide-4" data-index="3">
+    <p class="slide-tag">Competition</p>
+    <h2 class="slide-title">The <span class="accent">Sumo Robot</span> Competition</h2>
+    <div class="divider"></div>
+
+    <div class="competition-layout">
+      <div class="comp-images">
+        <img src="images/image1.jpg"  alt="Competition photo 1" />
+        <img src="images/team.jpg"    alt="Competition photo 2" />
+        <img src="images/trophi.jpg"  alt="Championship trophy"  />
+      </div>
+
+      <div class="comp-video">
+        <video id="comp-video" muted loop playsinline preload="metadata" controls>
+          <source src="images/competition-video.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+      <div class="comp-info">
+        <div class="comp-fact">
+          <span class="fact-icon">🤖</span>
+          <span>Two autonomous robots in a ring — push the opponent out to win.</span>
+        </div>
+        <div class="comp-fact">
+          <span class="fact-icon">⚙️</span>
+          <span>Not the prettiest — but <strong style="color:var(--text-bright)">high-torque motors</strong> made it unstoppable.</span>
+        </div>
+        <div class="win-badge">🥇 Won every round — Undefeated</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SLIDE 5 — Quiz ══ -->
+  <section class="slide" id="slide-5" data-index="4">
+    <p class="slide-tag">Interactive</p>
+    <h2 class="slide-title">Quick <span class="accent">Quiz!</span></h2>
+    <div class="divider"></div>
+
+    <div class="quiz-container">
+      <div class="quiz-q">
+        <p class="q-label">Question 01</p>
+        <p class="q-text">Speed or Torque — which matters more in a Sumo Robot fight, and why?</p>
+        <div class="q-options">
+          <button class="q-option" data-q="1" data-choice="speed">⚡ Speed</button>
+          <button class="q-option" data-q="1" data-choice="torque">💪 Torque</button>
+        </div>
+        <div class="q-explanation" id="q1-explanation"></div>
+      </div>
+
+      <div class="quiz-q">
+        <p class="q-label">Question 02</p>
+        <p class="q-text">You want to build an IoT robot. Which platform do you choose?</p>
+        <div class="q-options">
+          <button class="q-option" data-q="2" data-choice="arduino">Arduino Uno</button>
+          <button class="q-option" data-q="2" data-choice="esp32">ESP32</button>
+          <button class="q-option" data-q="2" data-choice="rpi">Raspberry Pi</button>
+        </div>
+        <div class="q-explanation" id="q2-explanation"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SLIDE 6 — Learnings ══ -->
+  <section class="slide" id="slide-6" data-index="5">
+    <p class="slide-tag">Conclusion</p>
+    <h2 class="slide-title">What I <span class="accent">Learned</span></h2>
+    <div class="divider"></div>
+
+    <div class="learnings-container">
+      <div class="learning-item" data-delay="0">
+        <div class="learning-num">01</div>
+        <p class="learning-text"><strong>Start simple</strong> — even an LED blink is a great beginning. Every expert started there.</p>
+      </div>
+      <div class="learning-item" data-delay="160">
+        <div class="learning-num">02</div>
+        <p class="learning-text"><strong>Function over looks</strong> — our "ugly" robot beat every polished competitor.</p>
+      </div>
+      <div class="learning-item" data-delay="320">
+        <div class="learning-num">03</div>
+        <p class="learning-text"><strong>Don't fear competition</strong> — even as a beginner, showing up is half the battle.</p>
+      </div>
+      <div class="learning-item" data-delay="480">
+        <div class="learning-num">04</div>
+        <p class="learning-text"><strong>Leadership matters</strong> — I led the team, and coordination was as important as the code.</p>
+      </div>
+    </div>
+
+    <div class="closing-box" id="closing-box">
+      <p class="closing-quote">
+        "Robotics didn't just teach me how to build machines —<br />
+        it taught me how to <span class="accent">think</span>,
+        <span class="accent">lead</span>, and fall in love with
+        <span class="accent">programming</span>."
+      </p>
+      <p class="thank-you">Thank You!</p>
+      <p class="questions-text">Any questions?</p>
+    </div>
+  </section>
+
+</div>
+
+<nav id="nav" aria-label="Slide navigation">
+  <button class="nav-btn" id="btn-prev" disabled>&#8592; Prev</button>
+  <button class="nav-btn" id="btn-next">Next &#8594;</button>
+</nav>
+
+<script>
+(function () {
+'use strict';
+
+/* ── Particles ── */
+const Particles = (() => {
+  const canvas = document.getElementById('particles-canvas');
+  const ctx    = canvas.getContext('2d');
+  let dots = [];
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function init() {
+    resize();
+    dots = Array.from({ length: 50 }, () => ({
+      x:  Math.random() * canvas.width,
+      y:  Math.random() * canvas.height,
+      r:  Math.random() * 1.3 + 0.3,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: (Math.random() - 0.5) * 0.25,
+      a:  Math.random() * 0.4 + 0.1,
+      hue: Math.random() > 0.8 ? 260 : 195,
+    }));
+    window.addEventListener('resize', resize);
+    loop();
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    dots.forEach(d => {
+      d.x += d.vx; d.y += d.vy;
+      if (d.x < 0) d.x = canvas.width;
+      if (d.x > canvas.width) d.x = 0;
+      if (d.y < 0) d.y = canvas.height;
+      if (d.y > canvas.height) d.y = 0;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${d.hue},100%,70%,${d.a})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(loop);
+  }
+
+  return { init };
+})();
+
+/* ── Voting ── */
+const Voting = (() => {
+  const counts = { yes: 0, no: 0 };
+  let current = null;   // currently selected choice, null = none
+
+  function vote(choice) {
+    // clicking the same button again → deselect
+    if (current === choice) {
+      counts[choice]--;
+      current = null;
+      document.querySelector(`.vote-btn.${choice}`).classList.remove('voted');
+      render();
+      return;
+    }
+    // switching from another choice → undo previous
+    if (current !== null) {
+      counts[current]--;
+      document.querySelector(`.vote-btn.${current}`).classList.remove('voted');
+    }
+    counts[choice]++;
+    current = choice;
+    document.querySelector(`.vote-btn.${choice}`).classList.add('voted');
+    render();
+  }
+
+  function render() {
+    const total = counts.yes + counts.no || 1;
+    const el = document.getElementById('vote-results');
+    el.innerHTML = `
+      <div class="vote-bar-row">
+        <span class="vote-bar-label yes">YES</span>
+        <div class="vote-bar-track"><div class="vote-bar-fill yes" style="width:${(counts.yes/total*100).toFixed(0)}%"></div></div>
+        <span class="vote-bar-count yes">${counts.yes}</span>
+      </div>
+      <div class="vote-bar-row">
+        <span class="vote-bar-label no">NO</span>
+        <div class="vote-bar-track"><div class="vote-bar-fill no" style="width:${(counts.no/total*100).toFixed(0)}%"></div></div>
+        <span class="vote-bar-count no">${counts.no}</span>
+      </div>`;
+  }
+
+  return { vote };
+})();
+
+/* ── Quiz ── */
+const Quiz = (() => {
+  const answered = {};
+  const DATA = {
+    1: {
+      torque: { cls: 'correct', text: '✅ <strong>Torque wins.</strong> In Sumo you push — raw force, not speed. High-torque motors keep the robot planted and dominate the pushing duel.' },
+      speed:  { cls: 'neutral', text: '⚡ Speed helps with the charge, but without torque a fast robot just bounces off. Torque is what decides Sumo matches.' },
+    },
+    2: {
+      arduino: { cls: 'neutral', text: '🔶 Arduino is great for learning but has <strong>no built-in Wi-Fi</strong>. You\'d need extra shields for IoT — more cost and complexity.' },
+      esp32:   { cls: 'correct', text: '✅ <strong>ESP32 is the ideal choice.</strong> Built-in Wi-Fi &amp; Bluetooth, powerful enough for real-time robotics, and very affordable.' },
+      rpi:     { cls: 'neutral', text: '🔷 Raspberry Pi can work but it\'s a full computer — overkill and power-hungry for a simple IoT robot. Better for vision or AI tasks.' },
+    },
+  };
+
+  function answer(qNum, choice, btn) {
+    if (answered[qNum]) return;
+    answered[qNum] = choice;
+    btn.closest('.quiz-q').querySelectorAll('.q-option').forEach(b => (b.disabled = true));
+    btn.classList.add(DATA[qNum][choice].cls);
+    const exp = document.getElementById(`q${qNum}-explanation`);
+    exp.innerHTML = DATA[qNum][choice].text;
+    exp.classList.add('visible');
+  }
+
+  return { answer };
+})();
+
+/* ── Learnings ── */
+const Learnings = (() => {
+  let triggered = false;
+
+  function trigger() {
+    if (triggered) return;
+    triggered = true;
+    document.querySelectorAll('.learning-item').forEach((item, i) => {
+      const delay = parseInt(item.dataset.delay || 0, 10);
+      setTimeout(() => item.classList.add('revealed'), delay);
+    });
+    setTimeout(() => document.getElementById('closing-box').classList.add('revealed'), 750);
+  }
+
+  function reset() {
+    triggered = false;
+    document.querySelectorAll('.learning-item').forEach(el => el.classList.remove('revealed'));
+    document.getElementById('closing-box').classList.remove('revealed');
+  }
+
+  return { trigger, reset };
+})();
+
+/* ── Presentation ── */
+const Presentation = (() => {
+  const slides   = Array.from(document.querySelectorAll('.slide'));
+  const total    = slides.length;
+  const progress = document.getElementById('progress-bar');
+  const btnPrev  = document.getElementById('btn-prev');
+  const btnNext  = document.getElementById('btn-next');
+  const curEl    = document.getElementById('cur');
+  const video    = document.getElementById('comp-video');
+  let current    = 0;
+  let dots       = [];
+
+  const pad = n => String(n).padStart(2, '0');
+
+  function buildDots() {
+    const bar = document.getElementById('topbar');
+    dots = slides.map((_, i) => {
+      const b = document.createElement('button');
+      b.className = 'dot-nav' + (i === 0 ? ' active' : '');
+      b.setAttribute('aria-label', `Go to slide ${i + 1}`);
+      b.onclick = () => goTo(i);
+      bar.appendChild(b);
+      return b;
+    });
+  }
+
+  function goTo(index) {
+    if (index < 0 || index >= total) return;
+
+    const leaving = slides[current];
+    leaving.classList.remove('active');
+    leaving.classList.add('exit-left');
+    setTimeout(() => leaving.classList.remove('exit-left'), 560);
+
+    if (current === 3 && video) video.pause();
+    if (current === 5) Learnings.reset();
+
+    current = index;
+
+    if (current === 3 && video) video.play().catch(() => {});
+    if (current === 5) Learnings.trigger();
+
+    const entering = slides[current];
+    entering.scrollTop = 0;
+    entering.classList.add('active');
+
+    curEl.textContent       = pad(current + 1);
+    progress.style.width    = `${((current + 1) / total) * 100}%`;
+    btnPrev.disabled        = current === 0;
+    btnNext.disabled        = current === total - 1;
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+  }
+
+  function prev() { goTo(current - 1); }
+  function next() { goTo(current + 1); }
+
+  function init() {
+    buildDots();
+    progress.style.width = `${(1 / total) * 100}%`;
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+      if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
+    });
+  }
+
+  return { init, prev, next };
+})();
+
+/* ── Wire up all buttons via addEventListener ── */
+function bindButtons() {
+
+  // Vote buttons
+  document.querySelectorAll('.vote-btn[data-vote]').forEach(btn => {
+    btn.addEventListener('click', () => Voting.vote(btn.dataset.vote));
+  });
+
+  // Quiz option buttons
+  document.querySelectorAll('.q-option[data-q]').forEach(btn => {
+    btn.addEventListener('click', () => Quiz.answer(
+      parseInt(btn.dataset.q, 10),
+      btn.dataset.choice,
+      btn
+    ));
+  });
+
+  // Nav prev / next
+  document.getElementById('btn-prev').addEventListener('click', () => Presentation.prev());
+  document.getElementById('btn-next').addEventListener('click', () => Presentation.next());
+}
+
+Particles.init();
+Presentation.init();
+bindButtons();
+
+}()); // end IIFE
+</script>
+</body>
+</html>
